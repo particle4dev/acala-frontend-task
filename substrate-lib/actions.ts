@@ -8,7 +8,9 @@ import {
   LOAD_KEYRING,
   SET_KEYRING,
   KEYRING_ERROR,
-  SELECT_ACCOUNT
+  SELECT_ACCOUNT,
+  UPDATE_START_BLOCK,
+  UPDATE_END_BLOCK
 } from './constants';
 
 export const connectInit = createAction(CONNECT_INIT);
@@ -33,4 +35,12 @@ export const setKeyring = createAction(SET_KEYRING, (keyring: any) => ({
 
 export const selectAccount = createAction(SELECT_ACCOUNT, (address: string) => ({
   address
+}));
+
+export const updateStartBlock = createAction(UPDATE_START_BLOCK, (block: number | string) => ({
+  block
+}));
+
+export const updateEndBlock = createAction(UPDATE_END_BLOCK, (block: number | string) => ({
+  block
 }));

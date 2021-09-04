@@ -23,3 +23,7 @@ export const KEYRING_ERROR = createSymbol('KEYRING_ERROR');
 export const ERROR = createSymbol('ERROR');
 
 export const SELECT_ACCOUNT = createSymbol('SELECT_ACCOUNT');
+
+export const UPDATE_START_BLOCK = createSymbol('UPDATE_START_BLOCK');
+
+export const UPDATE_END_BLOCK = createSymbol('UPDATE_END_BLOCK');

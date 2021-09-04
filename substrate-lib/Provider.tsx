@@ -3,12 +3,12 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
 import { connectInit, connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
 import SubstrateContext from './Context';
-import reducer, { initialState } from './reducer';
+import reducer, { initialState, InitialStateType } from './reducer';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const debug = require('debug')('substrate-lib:SubstrateProvider');
 
-const connect = (state: any, dispatch: any) => {
+const connect = (state: InitialStateType, dispatch: any) => {
   // const { apiState, socket, jsonrpc, types } = state;
   const { apiState } = state;
   // We only want this function to be performed once
@@ -18,7 +18,8 @@ const connect = (state: any, dispatch: any) => {
 
   // const provider = new WsProvider(socket);
   // const _api = new ApiPromise({ provider, types, rpc: jsonrpc });
-  const wsProvider = new WsProvider("ws://workspace.particle4dev.com:9944");
+  // const wsProvider = new WsProvider("ws://workspace.particle4dev.com:9944");
+  const wsProvider = new WsProvider("wss://rpc.polkadot.io");  
   const _api = new ApiPromise({ provider: wsProvider });
 
   // Set listeners for disconnection and reconnection event.
@@ -34,7 +35,7 @@ const connect = (state: any, dispatch: any) => {
 };
 
 let loadAccts = false;
-const loadAccounts = (state: any, dispatch: any) => {
+const loadAccounts = (state: InitialStateType, dispatch: any) => {
   const asyncLoadAccounts = async () => {
     dispatch(loadKeyring());
     try {
@@ -80,6 +81,8 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
   const contextValue: any = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
+
+  console.log(state);
 
   return (
     <SubstrateContext.Provider value={contextValue}>

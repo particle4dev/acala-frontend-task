@@ -12,7 +12,9 @@ import {
   ERROR,
   SET_KEYRING,
   KEYRING_ERROR,
-  SELECT_ACCOUNT
+  SELECT_ACCOUNT,
+  UPDATE_START_BLOCK,
+  UPDATE_END_BLOCK,
 } from './constants'
 
 export type InitialStateType = {
@@ -22,6 +24,8 @@ export type InitialStateType = {
   apiError: any;
   apiState: any;
   address: null | string;
+  startBlock: number | string;
+  endBlock: number | string;
 }
 
 // The initial state of the App
@@ -35,6 +39,10 @@ export const initialState: InitialStateType = {
   apiError: null,
   apiState: null,
   address: null,
+
+
+  startBlock: 12,
+  endBlock: 12,
 }
 
 export default handleActions(
@@ -69,6 +77,16 @@ export default handleActions(
 
     [SELECT_ACCOUNT]: (state: InitialStateType, {payload}: any) => {
       return { ...state, address: payload.address }
+    },
+
+    // [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
+    [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: any) => {
+      return { ...state, startBlock: payload.block }
+    },
+
+    // [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
+    [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: any) => {
+      return { ...state, endBlock: payload.block }
     },
   },
   initialState
