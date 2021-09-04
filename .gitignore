@@ -32,3 +32,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+run.sh
+stop.sh
+my.log
+dev-pid.txt
