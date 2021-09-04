@@ -1,6 +1,14 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "@next/next/no-css-tags": "off"
+    "@next/next/no-css-tags": "off",
+    "indent": [
+      "error",
+      2
+    ],
+    "semi": [
+      2,
+      "always"
+    ]
   }
 }

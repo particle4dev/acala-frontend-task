@@ -15,7 +15,7 @@ const width: IStringNumberMap = {
   mobile: 479,
   tablet: 767,
   desktop: 1024,
-  smarttv: 1920,
+  smarttv: 1920
   // console, not supported
   // wearable, not supported
   // embedded not supported
@@ -42,7 +42,7 @@ function Theme(props: ThemeProps) {
 
     theme.props = {
       // Change the default options of useMediaQuery
-      MuiUseMediaQuery: { ssrMatchMedia },
+      MuiUseMediaQuery: { ssrMatchMedia }
     };
   }
 

@@ -7,7 +7,7 @@ const useStyles = makeStyles({
   '@global': {
     a: {
       '&:active, &:hover, &:focus, &': {
-        textDecoration: 'none',
+        textDecoration: 'none'
       }
     }
   }

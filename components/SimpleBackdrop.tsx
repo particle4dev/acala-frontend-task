@@ -15,12 +15,12 @@ const useStyles = makeStyles((theme: Theme) => ({
     // Remove grey highlight
     WebkitTapHighlightColor: 'transparent',
     // Disable scroll capabilities.
-    touchAction: 'none',
+    touchAction: 'none'
   },
 
   /* Styles applied to the root element if `invisible={true}`. */
   invisible: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'transparent'
   }
 }));
 
