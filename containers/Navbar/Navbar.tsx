@@ -39,10 +39,10 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export type NavbarProps = WithStyles<typeof styles> & {
-  title?: React.ReactNode,
-  children?: React.ReactNode,
-  style?: React.CSSProperties,
-}
+  title?: React.ReactNode;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+};
 
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');

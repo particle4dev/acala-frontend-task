@@ -28,20 +28,10 @@ const useStyles = makeStyles({
   },
 });
 
-function createData(blocknumber: number, name: string, fat: number, carbs: number, protein: number) {
-  return { blocknumber, name, fat, carbs, protein };
-}
-
-const rows = [
-  createData(142000, 'event name', 6.0, 24, 4.0),
-  createData(142002, 'event name', 9.0, 37, 4.3),
-  createData(142003, 'event name', 16.0, 24, 6.0),
-  createData(142004, 'event name', 3.7, 67, 4.3),
-  createData(142005, 'event name', 16.0, 49, 3.9),
-];
-
 const Home = () => {
   const classes = useStyles();
+
+  const [events, setEvents] = React.useState<any[]>([]);
 
   const { state: { keyring, keyringState, address, api, startBlock, endBlock }, dispatch} = useSubstrate();
 
@@ -71,6 +61,8 @@ const Home = () => {
     // returns SignedBlock
     const signedBlock = await api.rpc.chain.getBlock(blockHash);
 
+    const list: any[] = [];
+
     const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
     // window.__allRecords = allRecords;
     // console.log(allRecords, 'allRecords');
@@ -84,10 +76,17 @@ const Home = () => {
           phase.isApplyExtrinsic &&
           phase.asApplyExtrinsic.eq(index)
         )
-        .map(({ event }: any) => `${event.section}.${event.method}`);
+        .map(({ event }: any) => {
+          list.push({
+            name: event.method
+          });
+          return `${event.section}.${event.method}`
+        });
 
       console.log(`${section}.${method}:: ${events.join(', ') || 'no events'}`);
     });
+
+    setEvents(list);
   }
 
   const handleStartBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,21 +148,20 @@ const Home = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.blocknumber}>
+              {events.map((row, index: number) => (
+                <TableRow key={`${row.name}-${index}`}>
                   <TableCell component="th" scope="row">
-                    {row.blocknumber}
+                    blocknumber
                   </TableCell>
                   <TableCell align="right">{row.name}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
-                  <TableCell align="right">{row.protein}</TableCell>
+                  <TableCell align="right"></TableCell>
+                  <TableCell align="right"></TableCell>
+                  <TableCell align="right"></TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
-
 
       </Section>
     </Content>
