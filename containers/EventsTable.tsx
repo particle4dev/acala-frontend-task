@@ -15,6 +15,11 @@ const useStyles = makeStyles({
   },
 });
 
+type Block = {
+  name: string;
+  blocknumber: number;
+};
+
 export type EventsTableProps = {
   loading: boolean;
   setLoading: (value: boolean) => void;
@@ -24,7 +29,7 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
 
   const classes = useStyles();
 
-  const [events, setEvents] = React.useState<any[]>([]);
+  const [events, setEvents] = React.useState<Block[]>([]);
 
   const { state: { api, startBlock, endBlock }} = useSubstrate();
 
@@ -34,15 +39,19 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
       // const signedBlock = await api.rpc.chain.getBlock();
       // OR
       // returns Hash
-      const blockHash = await api.rpc.chain.getBlockHash(1450000);
+      const blockHash = await api.rpc.chain.getBlockHash(block);
       // returns SignedBlock
       const signedBlock = await api.rpc.chain.getBlock(blockHash);
 
-      const list: any[] = [];
+      const list: Block[] = [];
 
       const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
       // window.__allRecords = allRecords;
       // console.log(allRecords, 'allRecords');
+
+      console.log(allRecords, 'allRecords');
+
+      console.log(signedBlock.block.extrinsics, 'signedBlock.block.extrinsics');
 
       // map between the extrinsics and events
       signedBlock.block.extrinsics.forEach(({ method: { method, section } }: any, index: number) => {
@@ -70,10 +79,10 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
 
   const onScan = async () => {
     setLoading(true);
-    let list: any = [];
+    let list: Block[] = [];
     for(let i = parseInt(`${startBlock}`); i <= parseInt(`${endBlock}`); i += 1) {
       const l = await showEventsOnBlock(i);
-      list = concat(l, list);
+      list = (concat(l, list) as Block[]);
     }
     setLoading(false);
     setEvents(list);
@@ -97,7 +106,7 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {events.map((row, index: number) => (
+        {events.map((row: Block, index: number) => (
           <TableRow key={`${row.name}-${index}`}>
             <TableCell component="th" scope="row">
               {row.blocknumber}

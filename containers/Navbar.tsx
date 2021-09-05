@@ -55,8 +55,6 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
 
   const { state: { address }} = useSubstrate();
 
-  console.log(address, 'address');
-
   const router = useRouter();
 
   function gotoLoginPage() {
@@ -85,7 +83,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
           </Typography>
         </ToolbarSection>
         <ToolbarSection end>
-          { isLoggedIn? <>
+          {isLoggedIn? <>
             <div className={classes.root_onlyBigScreen} style={{
               padding: '13px 0'
             }}>

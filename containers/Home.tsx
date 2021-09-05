@@ -10,17 +10,58 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-
-import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
-
 import Navbar from './Navbar';
 import Section from '../components/Section';
 import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
+import validate from '../components/Form/validate';
+import { requiredNumber } from '../components/Form/helper';
 import EventsTable from './EventsTable';
+
+const TextInput = ({ onChange, value, error, isError, ...props }: any) => (
+  <TextField
+    variant="outlined"
+    margin="none"
+    error={isError}
+    helperText={error}
+    value={value}
+    onChange={onChange}
+    {...props}
+  />
+);
+
+const ValidationStartBlockInput: React.Element = validate(TextInput, [requiredNumber], {
+  onChange: true,
+});
+
+const ValidationEndBlockInput: React.Element = validate(TextInput, [requiredNumber], {
+  onChange: true,
+});
+
+// https://github.com/polkadot-js/apps/blob/b8daf379e79360dd369f42401a5683f4ee624398/packages/apps/src/Endpoints/index.tsx
+function isValidUrl (url: string): boolean {
+  return (
+    // some random length... we probably want to parse via some lib
+    (url.length >= 7) &&
+    // check that it starts with a valid ws identifier
+    (url.startsWith('ws://') || url.startsWith('wss://') || url.startsWith('light://'))
+  );
+}
+
+const validWebSocketAddress = (value: any) =>
+  new Promise((resolve, reject) => {
+    if (!isValidUrl(value)) {
+      return reject(new Error(`Value must be a valid websocket address`));
+    }
+    return resolve(true);
+  });
+
+const ValidationEndpointInput: React.Element = validate(TextInput, [validWebSocketAddress], {
+  onChange: true,
+});
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -33,8 +74,7 @@ const useStyles = makeStyles(() =>
     },
 
     scanButton: {
-      display: 'flex',
-      alignItems: 'center'
+      marginTop: 10
     },
   })
 );
@@ -44,7 +84,7 @@ const Home = () => {
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  const { state: { keyring, keyringState, address, startBlock, endBlock }, dispatch} = useSubstrate();
+  const { state: { keyring, keyringState, address, startBlock, endBlock, filter }, dispatch} = useSubstrate();
 
   // Get the list of accounts we possess the private key for
   const keyringOptions = keyring.getPairs().map((account: any) => ({
@@ -63,14 +103,14 @@ const Home = () => {
 
   // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
   
-  const handleStartBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleStartBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
-    dispatch(updateStartBlock(event.target.value));
+    dispatch(updateStartBlock(value));
   };
 
-  const handleEndBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEndBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
-    dispatch(updateEndBlock(event.target.value));
+    dispatch(updateEndBlock(value));
   };
 
   const onScan = async () => {
@@ -94,20 +134,40 @@ const Home = () => {
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
-              
               <div className={classes.control}>
                 <Grid container spacing={2}>
                   <Grid item xs={3}>
-                    <TextField fullWidth disabled={loading} label="Start Block" variant="outlined" value={startBlock} onChange={handleStartBlockChange} />
+                    <ValidationStartBlockInput
+                      fullWidth
+                      disabled={loading}
+                      label="Start Block"
+                      variant="outlined"
+                      defaultValue={startBlock}
+                      onChange={handleStartBlockChange}
+                    />
                   </Grid>
                   <Grid item xs={3}>
-                    <TextField fullWidth disabled={loading} label="End Block" variant="outlined" value={endBlock} onChange={handleEndBlockChange} />
+                    <ValidationEndBlockInput
+                      fullWidth
+                      disabled={loading}
+                      label="End Block"
+                      variant="outlined"
+                      defaultValue={endBlock}
+                      onChange={handleEndBlockChange}
+                    />
                   </Grid>
                   <Grid item xs={5}>
-                    <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={"wss://rpc.polkadot.io"} />
+                    {/* <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={filter.endpoint} /> */}
+                    <ValidationEndpointInput 
+                      fullWidth
+                      disabled={loading}
+                      label="Endpoint"
+                      variant="outlined"
+                      defaultValue={filter.endpoint}
+                    />
                   </Grid>
-                  <Grid item xs={1} className={classes.scanButton}>
-                    <Button disableElevation disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
+                  <Grid item xs={1}>
+                    <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
