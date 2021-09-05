@@ -7,6 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { EventRecord } from '@polkadot/types/interfaces';
 import { useSubstrate } from '../substrate-lib'
 
 const useStyles = makeStyles({
@@ -16,8 +17,11 @@ const useStyles = makeStyles({
 });
 
 type Block = {
-  name: string;
-  blocknumber: number;
+  name?: string;
+  blocknumber?: string;
+  // phase?: Record<string, any>;
+  phase?: string;
+  data?: string;
 };
 
 export type EventsTableProps = {
@@ -49,29 +53,17 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
       // window.__allRecords = allRecords;
       // console.log(allRecords, 'allRecords');
 
-      console.log(allRecords, 'allRecords');
-
-      console.log(signedBlock.block.extrinsics, 'signedBlock.block.extrinsics');
-
-      // map between the extrinsics and events
-      signedBlock.block.extrinsics.forEach(({ method: { method, section } }: any, index: number) => {
-        // filter the specific events based on the phase and then the
-        // index of our extrinsic in the block
-        const events = allRecords
-          .filter(({ phase }: any) =>
-            phase.isApplyExtrinsic &&
-            phase.asApplyExtrinsic.eq(index)
-          )
-          .map(({ event }: any) => {
-            list.unshift({
-              name: event.method,
-              blocknumber: block,
-            });
-            return `${event.section}.${event.method}`
-          });
-
-        console.log(`${section}.${method}:: ${events.join(', ') || 'no events'}`);
+      allRecords.forEach((data: EventRecord, index: number) => {
+        const { phase, event } = data;
+        const b: Block = {
+          blocknumber: `${block}-${index}`,
+          name: `${event.section}.${event.method}`,
+          phase: JSON.stringify(phase.toJSON()),
+          data: JSON.stringify(event.data.toJSON()),
+        };
+        list.push(b);
       });
+
       resolve(list);
     });
     
@@ -98,23 +90,21 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
     <Table className={classes.table} aria-label="simple table">
       <TableHead>
         <TableRow>
-          <TableCell>Block Number</TableCell>
-          <TableCell align="right">Event Name</TableCell>
-          <TableCell align="right">Event Arguments</TableCell>
-          <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-          <TableCell align="right">Protein&nbsp;(g)</TableCell>
+          <TableCell style={{minWidth: 150}}>Block Number</TableCell>
+          <TableCell>Name</TableCell>
+          <TableCell>Phase</TableCell>
+          <TableCell>Data</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {events.map((row: Block, index: number) => (
           <TableRow key={`${row.name}-${index}`}>
             <TableCell component="th" scope="row">
-              {row.blocknumber}
+              #{row.blocknumber}
             </TableCell>
-            <TableCell align="right">{row.name}</TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right"></TableCell>
-            <TableCell align="right"></TableCell>
+            <TableCell>{row.name}</TableCell>
+            <TableCell>{row.phase}</TableCell>
+            <TableCell>{row.data}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -122,4 +112,4 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
   )
 }
 
-export default EventsTable
+export default EventsTable;
