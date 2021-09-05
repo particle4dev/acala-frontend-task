@@ -23,17 +23,27 @@ export type Filter = {
   endpoint: string;
 }
 
+export type Wallet = {
+  key: null | string;
+  address: null | string;
+  balance: string;
+  name: string;
+  source: string;
+  isTesting: boolean;
+  isInjected: boolean;
+}
+
 export type InitialStateType = {
   keyring: any;
   keyringState: any;
   api: any;
   apiError: any;
   apiState: any;
-  address: null | string;
   startBlock: number | string;
   endBlock: number | string;
 
   filter: Filter;
+  wallet: Wallet;
 }
 
 // The initial state of the App
@@ -46,8 +56,6 @@ export const initialState: InitialStateType = {
   api: null,
   apiError: null,
   apiState: null,
-  address: null,
-
 
   startBlock: 12,
   endBlock: 12,
@@ -59,6 +67,16 @@ export const initialState: InitialStateType = {
     endBlock: 0,
     endpoint: process.env!.ENDPOINT || 'wss://rpc.polkadot.io',
   },
+
+  wallet: {
+    key: null,
+    address: null,
+    balance: '0',
+    name: '',
+    source: '',
+    isTesting: false,
+    isInjected: false,
+  }
 }
 
 export default handleActions(
@@ -92,7 +110,7 @@ export default handleActions(
     },
 
     [SELECT_ACCOUNT]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, address: payload.address }
+      return { ...state, wallet: payload.wallet }
     },
 
     // [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {

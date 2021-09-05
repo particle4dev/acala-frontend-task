@@ -8,7 +8,8 @@ import Button from '@material-ui/core/Button';
 import AppsIcon from '@material-ui/icons/Apps';
 import AppBar from '@material-ui/core/AppBar';
 import Identicon from '@polkadot/react-identicon';
-import { useSubstrate } from '../substrate-lib'
+import type { KeyringPair } from '@polkadot/keyring/types';
+import { useSubstrate, selectAccount, Wallet, READY } from '../substrate-lib'
 import ToolbarSection from '../components/ToolbarSection';
 
 // size (optional) is a number, indicating the size (in pixels, 64 as default)
@@ -53,15 +54,44 @@ export type NavbarProps = WithStyles<typeof styles> & {
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');
 
-  const { state: { address }} = useSubstrate();
+  const { state: { keyring, keyringState, wallet, api}, dispatch} = useSubstrate();
+  
+  async function loadAccount() {
+    // Get the list of accounts we possess the private key for
+    const keyringOptions: Wallet[] = await Promise.all(keyring.getPairs().map(async (account: KeyringPair) => {
+      const { address, meta }: any = account;
+      const { data: balance } = await api.query.system.account(address);
+      return {
+        key: address,
+        address,
+        balance: balance.free.toString(),
+        name: meta.name.toUpperCase(),
+        source: meta.source,
+        isTesting: meta.isTesting,
+        isInjected: meta.isInjected,
+      }
+    }));
 
+    if(keyringOptions.length > 0) {
+      dispatch(selectAccount(keyringOptions[0]));
+    }
+  }
+  
+  // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
+  
   const router = useRouter();
 
   function gotoLoginPage() {
     router.push('/login');
   }
 
-  const isLoggedIn = true;
+  const isLoggedIn = keyringState === READY && wallet.address;
+
+  React.useEffect(() => {
+    if(keyringState === READY && !wallet.address) {
+      loadAccount();
+    }
+  }, [keyringState, wallet]);
 
   return (
     <AppBar
@@ -94,7 +124,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                   textAlign: 'right',
                 }}
               >
-                username
+                {wallet.name}
               </Typography>
 
               <Typography
@@ -105,13 +135,13 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                   lineHeight: 1.2,
                 }}
               >
-                World Level 1
+                {wallet.balance}
               </Typography>
             </div>
             <IconButton color="inherit">
               <Identicon
                 className="h-8 w-8 rounded-full"
-                value={address}
+                value={wallet.address}
                 size={size}
                 theme={theme}
               />

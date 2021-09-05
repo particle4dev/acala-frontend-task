@@ -58,8 +58,6 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
       const list: Block[] = [];
 
       const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
-      // window.__allRecords = allRecords;
-      // console.log(allRecords, 'allRecords');
 
       allRecords.forEach((data: EventRecord, index: number) => {
         const { phase, event } = data;
@@ -69,7 +67,7 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
           phase: JSON.stringify(phase.toJSON()),
           data: JSON.stringify(event.data.toJSON()),
         };
-        list.push(b);
+        list.unshift(b);
       });
 
       resolve(list);

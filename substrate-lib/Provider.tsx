@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
+import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { connectInit, connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
 import SubstrateContext from './Context';
 import reducer, { initialState, InitialStateType } from './reducer';
@@ -42,10 +43,20 @@ const loadAccounts = (state: InitialStateType, dispatch: any) => {
       const { web3Accounts, web3Enable } = (await import('@polkadot/extension-dapp'));
       await web3Enable('proof-of-existence-ui');
       let allAccounts = await web3Accounts();
-      console.log(allAccounts, 'allAccounts');
-      allAccounts = allAccounts.map(({ address, meta }: any) =>
-        ({ address, meta: { ...meta, name: `${meta.name} (${meta.source})` } }));
-      keyring.loadAll({ isDevelopment: true }, allAccounts);
+
+      allAccounts = allAccounts.map(({ address, meta }: InjectedAccountWithMeta) =>
+        ({
+          address,
+          meta: {
+            ...meta,
+            name: `${meta.name} (${meta.source})`
+          }
+        })
+      );
+
+      keyring.loadAll({
+        isDevelopment: process.env!.NODE_ENV === 'development'
+      }, allAccounts);
       dispatch(setKeyring(keyring));
     } catch (e) {
       console.error(e);
@@ -81,8 +92,6 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
   const contextValue: any = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
-
-  console.log(state);
 
   return (
     <SubstrateContext.Provider value={contextValue}>

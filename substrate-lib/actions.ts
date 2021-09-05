@@ -12,6 +12,7 @@ import {
   UPDATE_START_BLOCK,
   UPDATE_END_BLOCK
 } from './constants';
+import { Wallet } from './reducer';
 
 export const connectInit = createAction(CONNECT_INIT);
 
@@ -33,8 +34,8 @@ export const setKeyring = createAction(SET_KEYRING, (keyring: any) => ({
   keyring
 }));
 
-export const selectAccount = createAction(SELECT_ACCOUNT, (address: string) => ({
-  address
+export const selectAccount = createAction(SELECT_ACCOUNT, (wallet: Wallet) => ({
+  wallet
 }));
 
 export const updateStartBlock = createAction(UPDATE_START_BLOCK, (block: number | string) => ({

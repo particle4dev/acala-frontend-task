@@ -1,7 +1,7 @@
 import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
-import { useSubstrate, selectAccount, updateStartBlock, updateEndBlock, READY } from '../substrate-lib'
+import { useSubstrate, updateStartBlock, updateEndBlock } from '../substrate-lib'
 import {makeStyles, createStyles } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -85,25 +85,8 @@ const Home = () => {
 
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  const { state: { keyring, keyringState, address, startBlock, endBlock, filter }, dispatch} = useSubstrate();
+  const { state: { startBlock, endBlock, filter }, dispatch} = useSubstrate();
 
-  // Get the list of accounts we possess the private key for
-  const keyringOptions = keyring.getPairs().map((account: any) => ({
-    key: account.address,
-    value: account.address,
-    text: account.meta.name.toUpperCase(),
-    icon: 'user'
-  }));
-
-  const initialAddress =
-    keyringOptions.length > 0 ? keyringOptions[0].value : '';
-
-  if(!address) {
-    dispatch(selectAccount(initialAddress));  
-  }
-
-  // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
-  
   const handleStartBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
     dispatch(updateStartBlock(value));
