@@ -1,10 +1,8 @@
 import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
-import concat from 'lodash/concat';
-import parseInt from 'lodash/parseInt';
 import { useSubstrate, selectAccount, updateStartBlock, updateEndBlock, READY } from '../substrate-lib'
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles, createStyles } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -12,6 +10,11 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+
+import InputBase from '@material-ui/core/InputBase';
+import SearchIcon from '@material-ui/icons/Search';
+import InputAdornment from '@material-ui/core/InputAdornment';
+
 import Navbar from './Navbar';
 import Section from '../components/Section';
 import Content from '../components/Content';
@@ -19,20 +22,22 @@ import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import EventsTable from './EventsTable';
 
-const useStyles = makeStyles({
-  control: {
-    '-webkit-box-align': 'center',
-    alignItems: 'center',
-    display: 'flex',
-    flexWrap: 'wrap',
-    padding: 16
-  },
+const useStyles = makeStyles(() =>
+  createStyles({
+    control: {
+      '-webkit-box-align': 'center',
+      alignItems: 'center',
+      display: 'flex',
+      flexWrap: 'wrap',
+      padding: 16
+    },
 
-  scanButton: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-});
+    scanButton: {
+      display: 'flex',
+      alignItems: 'center'
+    },
+  })
+);
 
 const Home = () => {
   const classes = useStyles();
@@ -89,24 +94,42 @@ const Home = () => {
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
+              
               <div className={classes.control}>
                 <Grid container spacing={2}>
-                  <Grid item xs={2}>
+                  <Grid item xs={3}>
                     <TextField fullWidth disabled={loading} label="Start Block" variant="outlined" value={startBlock} onChange={handleStartBlockChange} />
                   </Grid>
-                  <Grid item xs={2}>
+                  <Grid item xs={3}>
                     <TextField fullWidth disabled={loading} label="End Block" variant="outlined" value={endBlock} onChange={handleEndBlockChange} />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid item xs={5}>
                     <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={"wss://rpc.polkadot.io"} />
                   </Grid>
-                  <Grid item xs={2} className={classes.scanButton}>
+                  <Grid item xs={1} className={classes.scanButton}>
                     <Button disableElevation disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      disabled={loading}
+                      variant="outlined" 
+                      id="input-with-icon-search"
+                      label="Search"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
                   </Grid>
                 </Grid>
               </div>
-
               <EventsTable loading={loading} setLoading={setLoading} />
+              <SectionSpacingBottom />
+
             </TableContainer>
           </Grid>
         </Grid>
