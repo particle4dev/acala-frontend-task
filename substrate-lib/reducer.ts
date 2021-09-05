@@ -17,6 +17,12 @@ import {
   UPDATE_END_BLOCK,
 } from './constants'
 
+export type Filter = {
+  startBlock: number;
+  endBlock: number;
+  endpoint: string;
+}
+
 export type InitialStateType = {
   keyring: any;
   keyringState: any;
@@ -26,6 +32,8 @@ export type InitialStateType = {
   address: null | string;
   startBlock: number | string;
   endBlock: number | string;
+
+  filter: Filter;
 }
 
 // The initial state of the App
@@ -43,6 +51,14 @@ export const initialState: InitialStateType = {
 
   startBlock: 12,
   endBlock: 12,
+
+
+  /** new */
+  filter: {
+    startBlock: 0,
+    endBlock: 0,
+    endpoint: process.env!.ENDPOINT || 'wss://rpc.polkadot.io',
+  },
 }
 
 export default handleActions(
