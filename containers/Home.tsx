@@ -1,94 +1,63 @@
-import * as React from 'react'
+import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
-import isNumber from 'lodash/isNumber';
+// import isNumber from 'lodash/isNumber';
+import concat from 'lodash/concat';
 import parseInt from 'lodash/parseInt';
 import { useSubstrate, selectAccount, updateStartBlock, updateEndBlock, READY } from '../substrate-lib'
-// import Navbar from './Navbar'
-// import DocumentDigestList from './DocumentDigestList'
-// import DropFile from './DropFile'
-// import Footer from './Footer'
 import { makeStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
+// import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import Navbar from './Navbar';
 import Section from '../components/Section';
 import Content from '../components/Content';
+import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
+import EventsTable from './EventsTable';
 
 const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
+  control: {
+    '-webkit-box-align': 'center',
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: 'wrap',
+    padding: 16
+  },
+
+  scanButton: {
+    display: 'flex',
+    alignItems: 'center'
   },
 });
 
 const Home = () => {
   const classes = useStyles();
 
-  const [events, setEvents] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
 
-  const { state: { keyring, keyringState, address, api, startBlock, endBlock }, dispatch} = useSubstrate();
+  const { state: { keyring, keyringState, address, startBlock, endBlock }, dispatch} = useSubstrate();
 
   // Get the list of accounts we possess the private key for
-  // const keyringOptions = keyring.getPairs().map((account: any) => ({
-  //   key: account.address,
-  //   value: account.address,
-  //   text: account.meta.name.toUpperCase(),
-  //   icon: 'user'
-  // }));
+  const keyringOptions = keyring.getPairs().map((account: any) => ({
+    key: account.address,
+    value: account.address,
+    text: account.meta.name.toUpperCase(),
+    icon: 'user'
+  }));
 
-  // const initialAddress =
-  //   keyringOptions.length > 0 ? keyringOptions[0].value : '';
+  const initialAddress =
+    keyringOptions.length > 0 ? keyringOptions[0].value : '';
 
-  // if(!address) {
-  //   dispatch(selectAccount(initialAddress));  
-  // }
+  if(!address) {
+    dispatch(selectAccount(initialAddress));  
+  }
 
   // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
   
-  async function showEventsOnBlock(block: number) {
-    // // no blockHash is specified, so we retrieve the latest
-    // const signedBlock = await api.rpc.chain.getBlock();
-    // OR
-    // returns Hash
-    const blockHash = await api.rpc.chain.getBlockHash(1450000);
-    // returns SignedBlock
-    const signedBlock = await api.rpc.chain.getBlock(blockHash);
-
-    const list: any[] = [];
-
-    const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
-    // window.__allRecords = allRecords;
-    // console.log(allRecords, 'allRecords');
-
-    // map between the extrinsics and events
-    signedBlock.block.extrinsics.forEach(({ method: { method, section } }: any, index: number) => {
-      // filter the specific events based on the phase and then the
-      // index of our extrinsic in the block
-      const events = allRecords
-        .filter(({ phase }: any) =>
-          phase.isApplyExtrinsic &&
-          phase.asApplyExtrinsic.eq(index)
-        )
-        .map(({ event }: any) => {
-          list.push({
-            name: event.method
-          });
-          return `${event.section}.${event.method}`
-        });
-
-      console.log(`${section}.${method}:: ${events.join(', ') || 'no events'}`);
-    });
-
-    setEvents(list);
-  }
-
   const handleStartBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // if(isNumber(event.target.value))
     dispatch(updateStartBlock(event.target.value));
@@ -99,69 +68,54 @@ const Home = () => {
     dispatch(updateEndBlock(event.target.value));
   };
 
-  const onScan = () => {
-    for(let i = parseInt(`${startBlock}`); i <= parseInt(`${endBlock}`); i += 1) {
-      showEventsOnBlock(i);
-    }
+  const onScan = async () => {
+    setLoading(true);
   }
 
   return (
     <>
+      {loading && <ProgressBar />}
       <Navbar />
 
-      <Content top={112} bottom={128}>
+      <Content top={64}>
         <Section>
         <SectionSpacingBottom />
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h5" gutterBottom>
+              Overview
+            </Typography>
+          </Grid>
 
-        <div className="max-w-screen-xl mx-auto px-3 sm:px-5 lg:px-6 pt-20 pb-20">
-          <header className="text-center">
-            <h1 className="text-5xl text-gray-900 font-bold whitespace-pre-line leading-hero">
-              Proof of Existence
-            </h1>
-            <div className="text-2xl whitespace-pre-line mt-6 mb-6">
-              Written forever.
-            </div>
-          </header>
-        </div>
+          <Grid item xs={12}>
+            <TableContainer component={Paper} variant="outlined" elevation={0}>
+              <div className={classes.control}>
+                <Grid container spacing={2}>
+                  <Grid item xs={2}>
+                    <TextField fullWidth disabled={loading} label="Start Block" variant="outlined" value={startBlock} onChange={handleStartBlockChange} />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <TextField fullWidth disabled={loading} label="End Block" variant="outlined" value={endBlock} onChange={handleEndBlockChange} />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={"wss://rpc.polkadot.io"} />
+                  </Grid>
+                  <Grid item xs={2} className={classes.scanButton}>
+                    <Button disableElevation disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
+                  </Grid>
+                </Grid>
+              </div>
+
+              <EventsTable loading={loading} setLoading={setLoading} />
+            </TableContainer>
+          </Grid>
+        </Grid>
         {/*
         <DropFile accountPair={accountPair} />
 
         <DocumentDigestList />
 
         <Footer /> */}
-
-        <TextField label="start block" value={startBlock} onChange={handleStartBlockChange} />
-
-        <TextField label="end block" value={endBlock} onChange={handleEndBlockChange} />
-
-        <Button variant="contained" onClick={onScan}>Scan</Button>
-
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Block Number</TableCell>
-                <TableCell align="right">Event Name</TableCell>
-                <TableCell align="right">Event Arguments</TableCell>
-                <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                <TableCell align="right">Protein&nbsp;(g)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {events.map((row, index: number) => (
-                <TableRow key={`${row.name}-${index}`}>
-                  <TableCell component="th" scope="row">
-                    blocknumber
-                  </TableCell>
-                  <TableCell align="right">{row.name}</TableCell>
-                  <TableCell align="right"></TableCell>
-                  <TableCell align="right"></TableCell>
-                  <TableCell align="right"></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
 
       </Section>
     </Content>
@@ -170,7 +124,3 @@ const Home = () => {
 }
 
 export default Home
-
-
-
-

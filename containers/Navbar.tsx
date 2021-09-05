@@ -1,15 +1,21 @@
 import * as React from "react";
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import MenuIcon from '@material-ui/icons/Menu';
 import AppsIcon from '@material-ui/icons/Apps';
-import AppBar from '../../components/AppBar';
-import ToolbarSection from '../../components/ToolbarSection';
+import AppBar from '@material-ui/core/AppBar';
+import Identicon from '@polkadot/react-identicon';
+import { useSubstrate } from '../substrate-lib'
+import ToolbarSection from '../components/ToolbarSection';
+
+// size (optional) is a number, indicating the size (in pixels, 64 as default)
+const size = 40;
+// theme (optional), depicts the type of icon, one of
+// 'polkadot', 'substrate' (default), 'beachball' or 'jdenticon'
+const theme = 'polkadot';
 
 const debug = require('debug')('containers:Navbar');
 
@@ -47,7 +53,10 @@ export type NavbarProps = WithStyles<typeof styles> & {
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');
 
-  const anchorEl = React.useRef(null);
+  const { state: { address }} = useSubstrate();
+
+  console.log(address, 'address');
+
   const router = useRouter();
 
   function gotoLoginPage() {
@@ -57,36 +66,23 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   const isLoggedIn = true;
 
   return (
-    <AppBar className={classes.root} style={style} elevation={0}>
-      <Toolbar ref={anchorEl}>
+    <AppBar
+      position="fixed"
+      color="default"
+      className={classes.root} style={style} elevation={0}
+    >
+      <Toolbar>
         <ToolbarSection
           start
           style={{
             flex: 1,
           }}
         >
-          <div
-            // className={classes.root__onlySmallScreen}
-            style={{
-              margin: '8px 0',
-            }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="Menu"
-            >
-              <MenuIcon />
-            </IconButton>
-          </div>
-          title
-        </ToolbarSection>
-        <ToolbarSection className={classes.root_onlyBigScreen} style={{
-          textAlign: 'center',
-          justifyContent: 'center'
-        }}>
-          <Link href="/">
-            LOGO
-          </Link>
+          <Typography variant="h6" component="p" style={{
+            margin: '8px 8px 0px',
+          }}>
+            {title}
+          </Typography>
         </ToolbarSection>
         <ToolbarSection end>
           { isLoggedIn? <>
@@ -115,7 +111,12 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
               </Typography>
             </div>
             <IconButton color="inherit">
-              avatar
+              <Identicon
+                className="h-8 w-8 rounded-full"
+                value={address}
+                size={size}
+                theme={theme}
+              />
             </IconButton>
 
             <IconButton
@@ -125,7 +126,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
             >
               <AppsIcon className={classes.avatar} />
             </IconButton>
-          </> : <Button variant="contained" color="primary" onClick={gotoLoginPage}>
+          </> : <Button variant="contained" color="primary" disableElevation onClick={gotoLoginPage}>
             Login
           </Button>}
         </ToolbarSection>
@@ -140,7 +141,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 Navbar.defaultProps = {
-  title: null
+  title: 'Polkadot Scanner'
 };
 
 export default React.memo(withStyles(styles, {name: 'containers__Navbar'})(Navbar));
