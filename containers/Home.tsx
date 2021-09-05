@@ -33,11 +33,11 @@ const TextInput = ({ onChange, value, error, isError, ...props }: any) => (
   />
 );
 
-const ValidationStartBlockInput: React.Element = validate(TextInput, [requiredNumber], {
+const ValidationStartBlockInput = validate(TextInput, [requiredNumber], {
   onChange: true,
 });
 
-const ValidationEndBlockInput: React.Element = validate(TextInput, [requiredNumber], {
+const ValidationEndBlockInput = validate(TextInput, [requiredNumber], {
   onChange: true,
 });
 
@@ -59,7 +59,7 @@ const validWebSocketAddress = (value: any) =>
     return resolve(true);
   });
 
-const ValidationEndpointInput: React.Element = validate(TextInput, [validWebSocketAddress], {
+const ValidationEndpointInput = validate(TextInput, [validWebSocketAddress], {
   onChange: true,
 });
 

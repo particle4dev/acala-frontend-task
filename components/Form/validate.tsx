@@ -1,8 +1,9 @@
 import * as React from 'react';
+import {TextFieldProps} from '@material-ui/core/TextField';
 
 const debug = require('debug')('components:validate');
 
-interface Props {
+type Props = Omit<TextFieldProps, 'onChange'> & {
   onChange?: (value: any) => void;
   defaultValue?: any;
 }
