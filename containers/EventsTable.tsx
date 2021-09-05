@@ -7,13 +7,21 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Typography from '@material-ui/core/Typography';
 import { EventRecord } from '@polkadot/types/interfaces';
 import { useSubstrate } from '../substrate-lib'
+import EventsTableRowLoading from './EventsTableRowLoading';
 
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
+
+  emptyRow: {
+    padding: '10px 24px 10px 16px',
+    borderBottom: '1px solid rgba(224, 224, 224, 1)',
+    textAlign: 'center',
+  }
 });
 
 type Block = {
@@ -87,6 +95,7 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
   }, [loading, setLoading]);
 
   return (
+    <>
     <Table className={classes.table} aria-label="simple table">
       <TableHead>
         <TableRow>
@@ -97,6 +106,7 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
         </TableRow>
       </TableHead>
       <TableBody>
+        {loading && <EventsTableRowLoading />}
         {events.map((row: Block, index: number) => (
           <TableRow key={`${row.name}-${index}`}>
             <TableCell component="th" scope="row">
@@ -109,6 +119,14 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
         ))}
       </TableBody>
     </Table>
+
+    {!loading && events.length === 0 && <div className={classes.emptyRow}>
+      <Typography>
+        Sorry, no matching records found
+      </Typography>
+    </div>}
+
+    </>
   )
 }
 
