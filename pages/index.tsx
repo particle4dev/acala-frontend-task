@@ -1,14 +1,16 @@
 import * as React from 'react';
 import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
-import Typography from '@material-ui/core/Typography';
+// import Typography from '@material-ui/core/Typography';
 import {
   ERROR,
-  READY
+  READY,
+  useSubstrate
 } from '../substrate-lib';
-import { useSubstrate } from '../substrate-lib';
+import SimpleBackdrop from '../components/SimpleBackdrop';
+import ProgressBar from '../components/ProgressBar';
 // import Home from '../containers/Home';
-import LoadingScreen from '../components/LoadingScreen';
+// import LoadingScreen from '../components/LoadingScreen';
 
 const HomeWithNoSSR = dynamic(
   () => import('../containers/Home'),
@@ -16,7 +18,7 @@ const HomeWithNoSSR = dynamic(
 );
 
 const Index: NextPage = () => {  
-  const { state: { apiState, keyringState, filter }} = useSubstrate();
+  const { state: { apiState, keyringState }} = useSubstrate();
 
   const loader = (text: string) => <div>{text}</div>;
 
@@ -42,8 +44,10 @@ const Index: NextPage = () => {
   //     </Typography>
   //   </LoadingScreen>);
   // }
-
+  const loading = apiState !== READY || keyringState !== READY;
   return (<>
+    <SimpleBackdrop open={loading} />
+    {loading && <ProgressBar />}
     <HomeWithNoSSR />
   </>);
 };

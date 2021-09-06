@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
+import { useSnackbar, SnackbarMessage, OptionsObject, SnackbarKey } from 'notistack';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { connectInit, connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
 import SubstrateContext from './Context';
@@ -9,14 +10,19 @@ import reducer, { initialState, InitialStateType } from './reducer';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const debug = require('debug')('substrate-lib:SubstrateProvider');
 
-const connect = (state: InitialStateType, dispatch: any, force: boolean = false) => {
+const connect = (state: InitialStateType, dispatch: any, force: boolean = false, enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey) => {
   // const { apiState, socket, jsonrpc, types } = state;
   const { apiState, filter } = state;
   // We only want this function to be performed once
   if (apiState && !force) return;
 
   dispatch(connectInit());
-
+  enqueueSnackbar(`Connecting to ${filter.endpoint} ...`, {
+    anchorOrigin: {
+      vertical: 'top',
+      horizontal: 'right',
+    }
+  });
   // const provider = new WsProvider(socket);
   // const _api = new ApiPromise({ provider, types, rpc: jsonrpc });
   // const wsProvider = new WsProvider("ws://workspace.particle4dev.com:9944");
@@ -27,9 +33,20 @@ const connect = (state: InitialStateType, dispatch: any, force: boolean = false)
   _api.on('connected', () => {
     dispatch(connectNetwork(_api));
     // `ready` event is not emitted upon reconnection and is checked explicitly here.
-    _api.isReady.then(() => dispatch(connectSuccess()));
+    _api.isReady.then(() => {
+      dispatch(connectSuccess());
+    });
   });
-  _api.on('ready', () => dispatch(connectSuccess()));
+  _api.on('ready', () => {
+    dispatch(connectSuccess());
+    enqueueSnackbar(`Connected to ${filter.endpoint} successful!`, {
+      variant: 'success',
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+      }
+    });
+  });
   _api.on('error', (err: any) => {
     dispatch(connectError(err));
   });
@@ -37,9 +54,15 @@ const connect = (state: InitialStateType, dispatch: any, force: boolean = false)
 
 let loadAccts = false;
 
-const loadAccounts = (state: InitialStateType, dispatch: any) => {
+const loadAccounts = (state: InitialStateType, dispatch: any, enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey) => {
   const asyncLoadAccounts = async () => {
     dispatch(loadKeyring());
+    enqueueSnackbar(`Loading accounts ...`, {
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+      }
+    });
     try {
       const { web3Accounts, web3Enable } = (await import('@polkadot/extension-dapp'));
       await web3Enable('proof-of-existence-ui');
@@ -60,6 +83,13 @@ const loadAccounts = (state: InitialStateType, dispatch: any) => {
       }, allAccounts);
 
       dispatch(setKeyring(keyring));
+      enqueueSnackbar(`Loaded accounts successful!`, {
+        variant: 'success',
+        anchorOrigin: {
+          vertical: 'top',
+          horizontal: 'right',
+        }
+      });
     } catch (e) {
       console.error(e);
       dispatch(keyringError());
@@ -86,11 +116,13 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
 
   const [ state, dispatch ] = React.useReducer(reducer, initialState);
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const endpointRef = React.useRef<null | string>(null);
 
   React.useEffect(() => {
-    connect(state, dispatch, endpointRef.current !== state.filter.endpoint);
-    loadAccounts(state, dispatch);
+    connect(state, dispatch, endpointRef.current !== state.filter.endpoint, enqueueSnackbar);
+    loadAccounts(state, dispatch, enqueueSnackbar);
     endpointRef.current = state.filter.endpoint;
   }, [state.filter.endpoint]);
 

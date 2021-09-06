@@ -16,7 +16,6 @@ import Navbar from './Navbar';
 import Section from '../components/Section';
 import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar'
-// import SimpleBackdrop from '../components/SimpleBackdrop';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import validate from '../components/Form/validate';
 import { requiredNumber } from '../components/Form/helper';

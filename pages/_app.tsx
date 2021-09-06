@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import * as React from 'react';
 import NextHead from 'next/head';
+import { SnackbarProvider } from 'notistack';
 import type { AppProps } from 'next/app';
 import RobotoHead from '../components/RobotoHead';
 import ThemeProvider from '../components/ThemeProvider';
@@ -23,13 +24,15 @@ function MyApp({ Component, pageProps }: AppProps) {
       <meta charSet="utf-8" />
     </NextHead>
     
-    <SubstrateProvider>
-      <ThemeProvider theme={light}>
-        <Component {...pageProps} />
-        <GlobalStyle />
-        <Global />
-      </ThemeProvider>
-    </SubstrateProvider>
+    <SnackbarProvider maxSnack={3}>
+      <SubstrateProvider>
+        <ThemeProvider theme={light}>
+          <Component {...pageProps} />
+          <GlobalStyle />
+          <Global />
+        </ThemeProvider>
+      </SubstrateProvider>
+    </SnackbarProvider>
     <RobotoHead />
   </>;
 }
