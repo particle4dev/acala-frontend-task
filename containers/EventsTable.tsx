@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as JsSearch from 'js-search';
 import concat from 'lodash/concat';
 import parseInt from 'lodash/parseInt';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,7 +10,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import { EventRecord } from '@polkadot/types/interfaces';
-import { useSubstrate } from '../substrate-lib'
+import { useSubstrate, updateSearchState, LOADING, READY } from '../substrate-lib'
 import EventsTableRowLoading from './EventsTableRowLoading';
 
 const useStyles = makeStyles({
@@ -24,6 +25,8 @@ const useStyles = makeStyles({
   }
 });
 
+let searchApi: any = null;
+
 type Block = {
   name?: string;
   blocknumber?: string;
@@ -32,18 +35,15 @@ type Block = {
   data?: string;
 };
 
-export type EventsTableProps = {
-  loading: boolean;
-  setLoading: (value: boolean) => void;
-};
-
-const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
+const EventsTable = () => {
 
   const classes = useStyles();
 
   const [events, setEvents] = React.useState<Block[]>([]);
 
-  const { state: { api, startBlock, endBlock }} = useSubstrate();
+  const { state: { api, startBlock, endBlock, filter }, dispatch} = useSubstrate();
+
+  const loading = filter.status === LOADING;
 
   function showEventsOnBlock(block: number) {
     return new Promise(async (resolve, reject) => {
@@ -72,25 +72,43 @@ const EventsTable = ({ loading, setLoading }: EventsTableProps) => {
 
       resolve(list);
     });
-    
   }
 
   const onScan = async () => {
-    setLoading(true);
     let list: Block[] = [];
     for(let i = parseInt(`${startBlock}`); i <= parseInt(`${endBlock}`); i += 1) {
       const l = await showEventsOnBlock(i);
       list = (concat(l, list) as Block[]);
     }
-    setLoading(false);
+    dispatch(updateSearchState(READY));
     setEvents(list);
+
+    searchApi = new JsSearch.Search('blocknumber');
+    searchApi.addIndex('name');
+    searchApi.addDocuments(list);
+  }
+
+  function search() {
+    if(filter.searchInput !== '') {
+      const d = searchApi.search(filter.searchInput);
+      setEvents(d);
+    }
+    else {
+      setEvents(searchApi._documents);
+    }
   }
 
   React.useEffect(() => {
     if(loading) {
       onScan();
     }
-  }, [loading, setLoading]);
+  }, [loading, updateSearchState]);
+
+  React.useEffect(() => {
+    if(searchApi) {
+      search();
+    }
+  }, [filter.searchInput]);
 
   return (
     <>

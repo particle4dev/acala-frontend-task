@@ -15,12 +15,16 @@ import {
   SELECT_ACCOUNT,
   UPDATE_START_BLOCK,
   UPDATE_END_BLOCK,
+  UPDATE_SEARCH_INPUT,
+  UPDATE_SEARCH_STATE,
 } from './constants'
 
 export type Filter = {
   startBlock: number;
   endBlock: number;
   endpoint: string;
+  searchInput: string;
+  status: string;
 }
 
 export type Wallet = {
@@ -66,6 +70,8 @@ export const initialState: InitialStateType = {
     startBlock: 0,
     endBlock: 0,
     endpoint: process.env!.ENDPOINT || 'wss://rpc.polkadot.io',
+    searchInput: '',
+    status: READY,
   },
 
   wallet: {
@@ -82,45 +88,66 @@ export const initialState: InitialStateType = {
 export default handleActions(
   {
     [CONNECT_INIT]: (state: InitialStateType) => {
-      return { ...state, apiState: CONNECT_INIT }
+      return { ...state, apiState: CONNECT_INIT };
     },
 
     [CONNECT]: (state: InitialStateType, {payload}: {payload: {api: ApiPromise}}) => {
-      return { ...state, api: payload.api, apiState: CONNECTING }
+      return { ...state, api: payload.api, apiState: CONNECTING };
     },
 
     [CONNECT_SUCCESS]: (state: InitialStateType) => {
-      return { ...state, apiState: READY }
+      return { ...state, apiState: READY };
     },
 
     [CONNECT_ERROR]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, apiState: CONNECT_ERROR, apiError: payload.err }
+      return { ...state, apiState: CONNECT_ERROR, apiError: payload.err };
     },
 
     [LOAD_KEYRING]: (state: InitialStateType) => {
-      return { ...state, keyringState: LOADING }
+      return { ...state, keyringState: LOADING };
     },
 
     [KEYRING_ERROR]: (state: InitialStateType) => {
-      return { ...state, keyring: null, keyringState: ERROR }
+      return { ...state, keyring: null, keyringState: ERROR };
     },
 
     [SET_KEYRING]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, keyring: payload.keyring, keyringState: READY }
+      return { ...state, keyring: payload.keyring, keyringState: READY };
     },
 
     [SELECT_ACCOUNT]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, wallet: payload.wallet }
+      return { ...state, wallet: payload.wallet };
     },
 
     // [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
     [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, startBlock: payload.block }
+      return { ...state, startBlock: payload.block };
     },
 
     // [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
     [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, endBlock: payload.block }
+      return { ...state, endBlock: payload.block };
+    },
+
+    [UPDATE_SEARCH_INPUT]: (state: InitialStateType, {payload}: any) => {
+      const { input } = payload;
+      return Object.assign({}, state, {
+        filter: {
+          ...state.filter,
+          searchInput: input,
+        },
+      });
+    },
+
+    [UPDATE_SEARCH_STATE]: (state: InitialStateType, {payload}: any) => {
+      const { status } = payload;
+      return Object.assign({}, state, {
+        filter: {
+          ...state.filter,
+          status: status,
+          searchInput: status === LOADING ? '' : state.filter.searchInput,
+        },
+      });
     },
   },
   initialState

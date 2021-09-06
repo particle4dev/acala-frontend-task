@@ -1,7 +1,7 @@
 import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
-import { useSubstrate, updateStartBlock, updateEndBlock } from '../substrate-lib'
+import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, LOADING } from '../substrate-lib'
 import {makeStyles, createStyles } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -83,8 +83,6 @@ const useStyles = makeStyles(() =>
 const Home = () => {
   const classes = useStyles();
 
-  const [loading, setLoading] = React.useState<boolean>(false);
-
   const { state: { startBlock, endBlock, filter }, dispatch} = useSubstrate();
 
   const handleStartBlockChange = (value: number) => {
@@ -97,9 +95,15 @@ const Home = () => {
     dispatch(updateEndBlock(value));
   };
 
+  const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(updateSearchInput(event.target.value));
+  };
+
   const onScan = async () => {
-    setLoading(true);
+    dispatch(updateSearchState(LOADING));
   }
+
+  const loading = filter.status === LOADING;
 
   return (
     <>
@@ -158,6 +162,8 @@ const Home = () => {
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
+                      value={filter.searchInput}
+                      onChange={handleSearchInputChange}
                       disabled={loading}
                       variant="outlined" 
                       id="input-with-icon-search"
@@ -173,7 +179,7 @@ const Home = () => {
                   </Grid>
                 </Grid>
               </div>
-              <EventsTable loading={loading} setLoading={setLoading} />
+              <EventsTable />
               <SectionSpacingBottom />
 
             </TableContainer>

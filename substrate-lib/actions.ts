@@ -10,7 +10,9 @@ import {
   KEYRING_ERROR,
   SELECT_ACCOUNT,
   UPDATE_START_BLOCK,
-  UPDATE_END_BLOCK
+  UPDATE_END_BLOCK,
+  UPDATE_SEARCH_INPUT,
+  UPDATE_SEARCH_STATE
 } from './constants';
 import { Wallet } from './reducer';
 
@@ -44,4 +46,12 @@ export const updateStartBlock = createAction(UPDATE_START_BLOCK, (block: number 
 
 export const updateEndBlock = createAction(UPDATE_END_BLOCK, (block: number | string) => ({
   block
+}));
+
+export const updateSearchInput = createAction(UPDATE_SEARCH_INPUT, (input: string) => ({
+  input
+}));
+
+export const updateSearchState = createAction(UPDATE_SEARCH_STATE, (status: string) => ({
+  status
 }));
