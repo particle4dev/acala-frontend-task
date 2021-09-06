@@ -41,7 +41,7 @@ const EventsTable = () => {
 
   const [events, setEvents] = React.useState<Block[]>([]);
 
-  const { state: { api, startBlock, endBlock, filter }, dispatch} = useSubstrate();
+  const { state: { api, filter }, dispatch} = useSubstrate();
 
   const loading = filter.status === LOADING;
 
@@ -76,7 +76,7 @@ const EventsTable = () => {
 
   const onScan = async () => {
     let list: Block[] = [];
-    for(let i = parseInt(`${startBlock}`); i <= parseInt(`${endBlock}`); i += 1) {
+    for(let i = parseInt(`${filter.startBlock}`); i <= parseInt(`${filter.endBlock}`); i += 1) {
       const l = await showEventsOnBlock(i);
       list = (concat(l, list) as Block[]);
     }

@@ -11,7 +11,7 @@ const debug = require('debug')('substrate-lib:SubstrateProvider');
 
 const connect = (state: InitialStateType, dispatch: any) => {
   // const { apiState, socket, jsonrpc, types } = state;
-  const { apiState } = state;
+  const { apiState, filter } = state;
   // We only want this function to be performed once
   if (apiState) return;
 
@@ -20,7 +20,7 @@ const connect = (state: InitialStateType, dispatch: any) => {
   // const provider = new WsProvider(socket);
   // const _api = new ApiPromise({ provider, types, rpc: jsonrpc });
   // const wsProvider = new WsProvider("ws://workspace.particle4dev.com:9944");
-  const wsProvider = new WsProvider("wss://rpc.polkadot.io");  
+  const wsProvider = new WsProvider(filter.endpoint);  
   const _api = new ApiPromise({ provider: wsProvider });
 
   // Set listeners for disconnection and reconnection event.
@@ -92,6 +92,8 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
   const contextValue: any = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
+
+  // console.log(state, 'state');
 
   return (
     <SubstrateContext.Provider value={contextValue}>

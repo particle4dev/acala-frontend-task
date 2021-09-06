@@ -43,8 +43,6 @@ export type InitialStateType = {
   api: any;
   apiError: any;
   apiState: any;
-  startBlock: number | string;
-  endBlock: number | string;
 
   filter: Filter;
   wallet: Wallet;
@@ -60,10 +58,6 @@ export const initialState: InitialStateType = {
   api: null,
   apiError: null,
   apiState: null,
-
-  startBlock: 12,
-  endBlock: 12,
-
 
   /** new */
   filter: {
@@ -121,12 +115,22 @@ export default handleActions(
 
     // [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
     [UPDATE_START_BLOCK]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, startBlock: payload.block };
+      return Object.assign({}, state, {
+        filter: {
+          ...state.filter,
+          startBlock: payload.block ,
+        },
+      });
     },
 
     // [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: {payload: {block: number}}) => {
     [UPDATE_END_BLOCK]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, endBlock: payload.block };
+      return Object.assign({}, state, {
+        filter: {
+          ...state.filter,
+          endBlock: payload.block ,
+        },
+      });
     },
 
     [UPDATE_SEARCH_INPUT]: (state: InitialStateType, {payload}: any) => {

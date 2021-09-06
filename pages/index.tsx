@@ -10,7 +10,7 @@ import Home from '../containers/Home';
 import LoadingScreen from '../components/LoadingScreen';
 
 const Index: NextPage = () => {  
-  const { state: { apiState, keyringState }} = useSubstrate();
+  const { state: { apiState, keyringState, filter }} = useSubstrate();
 
   const loader = (text: string) => <div>{text}</div>;
 
@@ -19,7 +19,7 @@ const Index: NextPage = () => {
 
   else if (apiState !== READY) return (<LoadingScreen>
     <Typography variant="h6" component="h2" gutterBottom>
-      Connecting To Substrate ...
+      Connecting to {filter.endpoint} ...
     </Typography>
     <Typography variant="body2" component="p" gutterBottom>
       This may take a few seconds, please dont close this page.
@@ -29,7 +29,7 @@ const Index: NextPage = () => {
   if (keyringState !== READY) {
     return (<LoadingScreen>
       <Typography variant="h6" component="h2" gutterBottom>
-        Loading Accounts ...
+        Loading accounts ...
       </Typography>
       <Typography variant="body2" component="p" gutterBottom>
         Please review any extensions authorization.

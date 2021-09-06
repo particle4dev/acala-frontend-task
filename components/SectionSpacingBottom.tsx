@@ -1,18 +1,16 @@
 import * as React from 'react';
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
 
 const debug = require('debug')('components:SectionSpacingBottom');
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      marginBottom: theme.spacing(3),
-      height: 0
-    }
-  }),
-);
+const styles = (theme: Theme) => createStyles({
+  root: {
+    marginBottom: theme.spacing(3),
+    height: 0
+  }
+});
 
-export type SectionSpacingBottomProps = {
+export type SectionSpacingBottomProps = WithStyles<typeof styles> & {
   height?: number;
   style?: React.CSSProperties;
 }
@@ -20,9 +18,7 @@ export type SectionSpacingBottomProps = {
 const SectionSpacingBottom = React.forwardRef(function SectionSpacingBottom(props: SectionSpacingBottomProps, ref: React.Ref<HTMLDivElement>) {
   debug('render');
 
-  const classes = useStyles();
-
-  const { style = {}, height } = props;
+  const { style = {}, classes, height } = props;
 
   if(height) {
     style['marginBottom'] = height;
@@ -39,4 +35,4 @@ if(process.env.NODE_ENV !== 'production') {
 
 SectionSpacingBottom.defaultProps = {};
 
-export default SectionSpacingBottom;
+export default withStyles(styles, { name: 'components__SectionSpacingBottom' })(SectionSpacingBottom);

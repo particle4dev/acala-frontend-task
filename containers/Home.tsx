@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Home = () => {
   const classes = useStyles();
 
-  const { state: { startBlock, endBlock, filter }, dispatch} = useSubstrate();
+  const { state: { filter }, dispatch} = useSubstrate();
 
   const handleStartBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
@@ -99,6 +99,10 @@ const Home = () => {
 
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(updateSearchInput(event.target.value));
+  };
+
+  const handleEndpointChange = (value: string) => {
+    console.log(value);
   };
 
   const onScan = async () => {
@@ -134,7 +138,7 @@ const Home = () => {
                       disabled={loading}
                       label="Start Block"
                       variant="outlined"
-                      defaultValue={startBlock}
+                      defaultValue={`${filter.startBlock}`}
                       onChange={handleStartBlockChange}
                     />
                   </Grid>
@@ -144,18 +148,18 @@ const Home = () => {
                       disabled={loading}
                       label="End Block"
                       variant="outlined"
-                      defaultValue={endBlock}
+                      defaultValue={`${filter.endBlock}`}
                       onChange={handleEndBlockChange}
                     />
                   </Grid>
                   <Grid item sm={5} xs={12}>
-                    {/* <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={filter.endpoint} /> */}
                     <ValidationEndpointInput 
                       fullWidth
                       disabled={loading}
                       label="Endpoint"
                       variant="outlined"
                       defaultValue={filter.endpoint}
+                      onChange={handleEndpointChange}
                     />
                   </Grid>
                   <Grid item sm={1} xs={12}>
@@ -187,12 +191,6 @@ const Home = () => {
             </TableContainer>
           </Grid>
         </Grid>
-        {/*
-        <DropFile accountPair={accountPair} />
-
-        <DocumentDigestList />
-
-        <Footer /> */}
 
       </Section>
     </Content>

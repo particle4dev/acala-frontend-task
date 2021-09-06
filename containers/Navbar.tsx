@@ -48,7 +48,7 @@ export type NavbarProps = WithStyles<typeof styles> & {
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');
 
-  const { state: { keyring, keyringState, wallet, api}, dispatch} = useSubstrate();
+  const { state: { keyring, keyringState, wallet, api }, dispatch} = useSubstrate();
   
   async function loadAccount() {
     // Get the list of accounts we possess the private key for
