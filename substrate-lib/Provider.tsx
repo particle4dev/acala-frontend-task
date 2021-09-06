@@ -9,11 +9,11 @@ import reducer, { initialState, InitialStateType } from './reducer';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const debug = require('debug')('substrate-lib:SubstrateProvider');
 
-const connect = (state: InitialStateType, dispatch: any) => {
+const connect = (state: InitialStateType, dispatch: any, force: boolean = false) => {
   // const { apiState, socket, jsonrpc, types } = state;
   const { apiState, filter } = state;
   // We only want this function to be performed once
-  if (apiState) return;
+  if (apiState && !force) return;
 
   dispatch(connectInit());
 
@@ -36,6 +36,7 @@ const connect = (state: InitialStateType, dispatch: any) => {
 };
 
 let loadAccts = false;
+
 const loadAccounts = (state: InitialStateType, dispatch: any) => {
   const asyncLoadAccounts = async () => {
     dispatch(loadKeyring());
@@ -57,6 +58,7 @@ const loadAccounts = (state: InitialStateType, dispatch: any) => {
       keyring.loadAll({
         isDevelopment: process.env!.NODE_ENV === 'development'
       }, allAccounts);
+
       dispatch(setKeyring(keyring));
     } catch (e) {
       console.error(e);
@@ -84,16 +86,19 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
 
   const [ state, dispatch ] = React.useReducer(reducer, initialState);
 
+  const endpointRef = React.useRef<null | string>(null);
+
   React.useEffect(() => {
-    connect(state, dispatch);
+    connect(state, dispatch, endpointRef.current !== state.filter.endpoint);
     loadAccounts(state, dispatch);
-  }, []);
+    endpointRef.current = state.filter.endpoint;
+  }, [state.filter.endpoint]);
 
   const contextValue: any = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
 
-  // console.log(state, 'state');
+  console.log(state, 'state');
 
   return (
     <SubstrateContext.Provider value={contextValue}>

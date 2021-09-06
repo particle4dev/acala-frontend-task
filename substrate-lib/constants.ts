@@ -31,3 +31,5 @@ export const UPDATE_END_BLOCK = createSymbol('UPDATE_END_BLOCK');
 export const UPDATE_SEARCH_INPUT = createSymbol('UPDATE_SEARCH_INPUT');
 
 export const UPDATE_SEARCH_STATE = createSymbol('UPDATE_SEARCH_STATE');
+
+export const UPDATE_ENDPOINT_INPUT = createSymbol('UPDATE_ENDPOINT_INPUT');

@@ -12,7 +12,8 @@ import {
   UPDATE_START_BLOCK,
   UPDATE_END_BLOCK,
   UPDATE_SEARCH_INPUT,
-  UPDATE_SEARCH_STATE
+  UPDATE_SEARCH_STATE,
+  UPDATE_ENDPOINT_INPUT
 } from './constants';
 import { Wallet } from './reducer';
 
@@ -54,4 +55,8 @@ export const updateSearchInput = createAction(UPDATE_SEARCH_INPUT, (input: strin
 
 export const updateSearchState = createAction(UPDATE_SEARCH_STATE, (status: string) => ({
   status
+}));
+
+export const updateEndpointInput = createAction(UPDATE_ENDPOINT_INPUT, (input: string) => ({
+  input
 }));

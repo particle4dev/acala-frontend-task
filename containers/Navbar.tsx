@@ -48,7 +48,7 @@ export type NavbarProps = WithStyles<typeof styles> & {
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');
 
-  const { state: { keyring, keyringState, wallet, api }, dispatch} = useSubstrate();
+  const { state: { keyring, keyringState, wallet, api, apiState }, dispatch } = useSubstrate();
   
   async function loadAccount() {
     // Get the list of accounts we possess the private key for
@@ -82,10 +82,11 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   const isLoggedIn = keyringState === READY && wallet.address;
 
   React.useEffect(() => {
-    if(keyringState === READY && !wallet.address) {
+    console.log(keyringState, 'keyringState');
+    if(keyringState === READY && !wallet.address && apiState === READY) {
       loadAccount();
     }
-  }, [keyringState, wallet]);
+  }, [keyringState, wallet, apiState]);
 
   return (
     <AppBar

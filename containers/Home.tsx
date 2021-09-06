@@ -1,7 +1,7 @@
 import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
-import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, LOADING } from '../substrate-lib'
+import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, updateEndpointInput, LOADING } from '../substrate-lib'
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -87,6 +87,8 @@ const Home = () => {
 
   const { state: { filter }, dispatch} = useSubstrate();
 
+  const [endpoint, setEndpoint] = React.useState<string>(filter.endpoint);
+
   const handleStartBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
     dispatch(updateStartBlock(value));
@@ -102,7 +104,14 @@ const Home = () => {
   };
 
   const handleEndpointChange = (value: string) => {
-    console.log(value);
+    setEndpoint(value);
+  };
+
+  const onSetEndpoint = () => {
+    console.log(endpoint, 'endpoint');
+    if(endpoint !== filter.endpoint) {
+      dispatch(updateEndpointInput(endpoint));
+    }
   };
 
   const onScan = async () => {
@@ -158,9 +167,10 @@ const Home = () => {
                       disabled={loading}
                       label="Endpoint"
                       variant="outlined"
-                      defaultValue={filter.endpoint}
+                      defaultValue={endpoint}
                       onChange={handleEndpointChange}
                     />
+                    <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onSetEndpoint}>Set</Button>
                   </Grid>
                   <Grid item sm={1} xs={12}>
                     <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>

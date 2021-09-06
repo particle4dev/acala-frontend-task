@@ -17,6 +17,7 @@ import {
   UPDATE_END_BLOCK,
   UPDATE_SEARCH_INPUT,
   UPDATE_SEARCH_STATE,
+  UPDATE_ENDPOINT_INPUT,
 } from './constants'
 
 export type Filter = {
@@ -63,7 +64,7 @@ export const initialState: InitialStateType = {
   filter: {
     startBlock: 0,
     endBlock: 0,
-    endpoint: process.env!.ENDPOINT || 'wss://rpc.polkadot.io',
+    endpoint: process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rpc.polkadot.io',
     searchInput: '',
     status: READY,
   },
@@ -150,6 +151,16 @@ export default handleActions(
           ...state.filter,
           status: status,
           searchInput: status === LOADING ? '' : state.filter.searchInput,
+        },
+      });
+    },
+    
+    [UPDATE_ENDPOINT_INPUT]: (state: InitialStateType, {payload}: any) => {
+      const { input } = payload;
+      return Object.assign({}, state, {
+        filter: {
+          ...state.filter,
+          endpoint: input,
         },
       });
     },
