@@ -2,7 +2,7 @@ import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
 import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, LOADING } from '../substrate-lib'
-import {makeStyles, createStyles } from '@material-ui/core/styles';
+import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -64,7 +64,7 @@ const ValidationEndpointInput = validate(TextInput, [validWebSocketAddress], {
   onChange: true,
 });
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     control: {
       '-webkit-box-align': 'center',
@@ -75,7 +75,9 @@ const useStyles = makeStyles(() =>
     },
 
     scanButton: {
-      marginTop: 10
+      [theme.breakpoints.up('sm')]: {
+        marginTop: 10
+      }
     },
   })
 );
@@ -126,7 +128,7 @@ const Home = () => {
             <TableContainer component={Paper} variant="outlined" elevation={0}>
               <div className={classes.control}>
                 <Grid container spacing={2}>
-                  <Grid item xs={3}>
+                  <Grid item sm={3} xs={12}>
                     <ValidationStartBlockInput
                       fullWidth
                       disabled={loading}
@@ -136,7 +138,7 @@ const Home = () => {
                       onChange={handleStartBlockChange}
                     />
                   </Grid>
-                  <Grid item xs={3}>
+                  <Grid item sm={3} xs={12}>
                     <ValidationEndBlockInput
                       fullWidth
                       disabled={loading}
@@ -146,7 +148,7 @@ const Home = () => {
                       onChange={handleEndBlockChange}
                     />
                   </Grid>
-                  <Grid item xs={5}>
+                  <Grid item sm={5} xs={12}>
                     {/* <TextField fullWidth disabled={loading} label="Endpoint" variant="outlined" value={filter.endpoint} /> */}
                     <ValidationEndpointInput 
                       fullWidth
@@ -156,10 +158,10 @@ const Home = () => {
                       defaultValue={filter.endpoint}
                     />
                   </Grid>
-                  <Grid item xs={1}>
+                  <Grid item sm={1} xs={12}>
                     <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item sm={6} xs={12}>
                     <TextField
                       fullWidth
                       value={filter.searchInput}

@@ -5,7 +5,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import AppsIcon from '@material-ui/icons/Apps';
 import AppBar from '@material-ui/core/AppBar';
 import Identicon from '@polkadot/react-identicon';
 import type { KeyringPair } from '@polkadot/keyring/types';
@@ -25,11 +24,6 @@ const styles = (theme: Theme) => createStyles({
     boxShadow: 'none',
     backgroundColor: theme.palette.background.default,
     // left: 72
-  },
-
-  avatar: {
-    width: 40,
-    height: 40
   },
 
   root__onlySmallScreen: {
@@ -101,9 +95,9 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
     >
       <Toolbar>
         <ToolbarSection
-          start
+          // start
           style={{
-            flex: 1,
+            flex: ' 1 1 auto'
           }}
         >
           <Typography variant="h6" component="p" style={{
@@ -145,14 +139,6 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                 size={size}
                 theme={theme}
               />
-            </IconButton>
-
-            <IconButton
-              className={classes.root__onlySmallScreen}
-              color="inherit"
-              aria-label="App"
-            >
-              <AppsIcon className={classes.avatar} />
             </IconButton>
           </> : <Button variant="contained" color="primary" disableElevation onClick={gotoLoginPage}>
             Login
