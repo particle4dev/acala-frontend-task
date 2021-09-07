@@ -84,7 +84,6 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   const isLoggedIn = keyringState === READY && wallet.address;
 
   React.useEffect(() => {
-    console.log(keyringState, 'keyringState');
     if(keyringState === READY && !wallet.address && apiState === READY && api) {
       loadAccount(api);
     }

@@ -124,9 +124,6 @@ export default handleActions(
       return { ...state, keyring: payload.keyring, keyringState: READY };
     },
 
-
-
-
     [SELECT_ACCOUNT]: (state: InitialStateType, {payload}: any) => {
       return { ...state, wallet: payload.wallet };
     },

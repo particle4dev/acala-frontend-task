@@ -3,7 +3,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
 import { useSnackbar, SnackbarMessage, OptionsObject, SnackbarKey } from 'notistack';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
+import { connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError, updateEndBlock } from './actions';
 import { INIT, READY } from './constants';
 import SubstrateContext from './Context';
 import reducer, { initialState, InitialStateType } from './reducer';
@@ -41,8 +41,13 @@ const connect = (state: InitialStateType, dispatch: any, enqueueSnackbar: (messa
     });
   });
 
-  _api.on('ready', () => {
+  _api.on('ready', async () => {
+    // no blockHash is specified, so we retrieve the latest
+    const signedBlock = await _api.rpc.chain.getBlock();
+    const blockNumber = signedBlock.block.header.number.toNumber();
+
     dispatch(connectSuccess());
+    dispatch(updateEndBlock(blockNumber));
     enqueueSnackbar(`Connected to ${endpoint} successful!`, {
       variant: 'success',
       anchorOrigin: {
@@ -146,7 +151,7 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
     return { state, dispatch };
   }, [state, dispatch]);
 
-  // console.log(state, 'SubstrateProvider.state');
+  console.log(state, 'SubstrateProvider.state');
 
   return (
     <SubstrateContext.Provider value={contextValue}>

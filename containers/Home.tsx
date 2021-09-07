@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
 import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, switchEndpoint, LOADING, READY } from '../substrate-lib'
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
@@ -118,7 +117,6 @@ const Home = () => {
   return (
     <>
       {loading && <ProgressBar />}
-      {/* <SimpleBackdrop open /> */}
 
       <Navbar />
 
@@ -202,4 +200,4 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Home;
