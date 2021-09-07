@@ -232,7 +232,7 @@ const Home = () => {
                       disabled={loading}
                       variant="outlined" 
                       id="input-with-icon-search"
-                      label="Search"
+                      label="Filter by name"
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
