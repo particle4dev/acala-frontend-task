@@ -24,7 +24,7 @@ import {
 
 export type Filter = {
   startBlock: number;
-  endBlock: number;
+  endBlock: number | null;
   searchInput: string;
   status: string;
 }
@@ -67,8 +67,8 @@ export const initialState: InitialStateType = {
 
   /** new */
   filter: {
-    startBlock: 0,
-    endBlock: 0,
+    startBlock: 1,
+    endBlock: null,
     searchInput: '',
     status: READY,
   },

@@ -13,7 +13,7 @@ const debug = require('debug')('substrate-lib:SubstrateProvider');
 
 const connect = (state: InitialStateType, dispatch: any, enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey) => {
   // const { apiState, socket, jsonrpc, types } = state;
-  const { apiState, api, endpoint } = state;
+  const { apiState, api, endpoint, filter } = state;
   // We only want this function to be performed once
   if (apiState === READY && api) {
     api.disconnect();
@@ -43,11 +43,13 @@ const connect = (state: InitialStateType, dispatch: any, enqueueSnackbar: (messa
 
   _api.on('ready', async () => {
     // no blockHash is specified, so we retrieve the latest
-    const signedBlock = await _api.rpc.chain.getBlock();
-    const blockNumber = signedBlock.block.header.number.toNumber();
-
+    if(filter.endBlock === null) {
+      const signedBlock = await _api.rpc.chain.getBlock();
+      const blockNumber = signedBlock.block.header.number.toNumber();
+      dispatch(updateEndBlock(blockNumber));
+    }
+    
     dispatch(connectSuccess());
-    dispatch(updateEndBlock(blockNumber));
     enqueueSnackbar(`Connected to ${endpoint} successful!`, {
       variant: 'success',
       anchorOrigin: {

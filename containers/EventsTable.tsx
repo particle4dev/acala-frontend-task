@@ -10,6 +10,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import { EventRecord } from '@polkadot/types/interfaces';
 import { useSubstrate, updateSearchState, LOADING, READY } from '../substrate-lib'
@@ -149,6 +150,7 @@ const EventsTable = () => {
   const loading = filter.status === LOADING && apiState === READY;
 
   const [order, setOrder] = React.useState<Order>('asc');
+  
   const [orderBy, setOrderBy] = React.useState<keyof Block>('blocknumber');
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Block) => {
@@ -186,9 +188,17 @@ const EventsTable = () => {
     });
   }
 
+  const rowsPerPage = 10;
+
   const onScan = async (api: ApiPromise) => {
     let list: Block[] = [];
-    for(let i = parseInt(`${filter.startBlock}`); i <= parseInt(`${filter.endBlock}`); i += 1) {
+    // set total
+    setCount(parseInt(`${filter.endBlock}`));
+
+    const start = parseInt(`${filter.startBlock}`) + page * rowsPerPage;
+    const end = start + rowsPerPage > parseInt(`${filter.endBlock}`) ? parseInt(`${filter.endBlock}`) : start + rowsPerPage;
+
+    for(let i = start; i <= end; i += 1) {
       const l = await showEventsOnBlock(i, api);
       list = (concat(l, list) as Block[]);
     }
@@ -210,6 +220,15 @@ const EventsTable = () => {
     }
   }
 
+  const [page, setPage] = React.useState(0);
+
+  const [count, setCount] = React.useState(0);
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+    dispatch(updateSearchState(LOADING));
+  };
+
   React.useEffect(() => {
     if(loading && apiState === READY && api) {
       onScan(api);
@@ -221,6 +240,10 @@ const EventsTable = () => {
       search();
     }
   }, [filter.searchInput]);
+
+  React.useEffect(() => {
+    setPage(0);
+  }, [filter.startBlock]);
 
   return (
     <>
@@ -253,6 +276,15 @@ const EventsTable = () => {
       </Typography>
     </div>}
 
+    <TablePagination
+      rowsPerPageOptions={[rowsPerPage]}
+      component="div"
+      count={count}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handleChangePage}
+      labelDisplayedRows={({ from, to, count }) => `${parseInt(`${filter.startBlock}`) + from} - ${ parseInt(`${filter.startBlock}`) + to} of ${count}`}
+    />
     </>
   )
 }

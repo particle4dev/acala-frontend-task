@@ -196,7 +196,7 @@ const Home = () => {
                       disabled={loading}
                       label="End Block"
                       variant="outlined"
-                      value={`${filter.endBlock}`}
+                      value={`${filter.endBlock || ''}`}
                       onChange={handleEndBlockChange}
                       onError={onErrorEndBlockChange}
                     />
