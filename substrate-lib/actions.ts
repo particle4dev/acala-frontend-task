@@ -1,10 +1,11 @@
 import { createAction } from 'redux-actions';
 import { ApiPromise } from '@polkadot/api';
 import {
-  CONNECT_INIT,
+  SWITCH_ENDPOINT,
   CONNECT,
   CONNECT_SUCCESS,
   CONNECT_ERROR,
+
   LOAD_KEYRING,
   SET_KEYRING,
   KEYRING_ERROR,
@@ -13,21 +14,13 @@ import {
   UPDATE_END_BLOCK,
   UPDATE_SEARCH_INPUT,
   UPDATE_SEARCH_STATE,
-  UPDATE_ENDPOINT_INPUT
 } from './constants';
 import { Wallet } from './reducer';
 
-export const connectInit = createAction(CONNECT_INIT);
 
-export const connectNetwork = createAction(CONNECT, (api: ApiPromise) => ({
-  api
-}));
 
-export const connectSuccess = createAction(CONNECT_SUCCESS);
 
-export const connectError = createAction(CONNECT_ERROR, (err: any) => ({
-  err
-}));
+
 
 export const loadKeyring = createAction(LOAD_KEYRING);
 
@@ -57,6 +50,20 @@ export const updateSearchState = createAction(UPDATE_SEARCH_STATE, (status: stri
   status
 }));
 
-export const updateEndpointInput = createAction(UPDATE_ENDPOINT_INPUT, (input: string) => ({
+/**
+ * ACTIONS CONECTION API
+ */
+export const switchEndpoint = createAction(SWITCH_ENDPOINT, (input: string) => ({
   input
 }));
+
+export const connectNetwork = createAction(CONNECT, (api: ApiPromise) => ({
+  api
+}));
+
+export const connectSuccess = createAction(CONNECT_SUCCESS);
+
+export const connectError = createAction(CONNECT_ERROR, (err: any) => ({
+  err
+}));
+

@@ -1,7 +1,7 @@
 import * as React from 'react';
 // import { ApiPromise, WsProvider } from '@polkadot/api'
 // import isNumber from 'lodash/isNumber';
-import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, updateEndpointInput, LOADING } from '../substrate-lib'
+import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, switchEndpoint, LOADING, READY } from '../substrate-lib'
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -84,9 +84,9 @@ const useStyles = makeStyles((theme: Theme) =>
 const Home = () => {
   const classes = useStyles();
 
-  const { state: { filter }, dispatch} = useSubstrate();
+  const { state: { filter, endpoint, apiState }, dispatch} = useSubstrate();
 
-  const [endpoint, setEndpoint] = React.useState<string>(filter.endpoint);
+  const [endpointStatus, setEndpoint] = React.useState<string>(endpoint || '');
 
   const handleStartBlockChange = (value: number) => {
     // if(isNumber(event.target.value))
@@ -106,18 +106,14 @@ const Home = () => {
     setEndpoint(value);
   };
 
-  const onSetEndpoint = () => {
-    console.log(endpoint, 'endpoint');
-    if(endpoint !== filter.endpoint) {
-      dispatch(updateEndpointInput(endpoint));
-    }
-  };
-
   const onScan = async () => {
+    if(endpointStatus !== endpoint) {
+      dispatch(switchEndpoint(endpointStatus));
+    }
     dispatch(updateSearchState(LOADING));
   }
 
-  const loading = filter.status === LOADING;
+  const loading = filter.status === LOADING && apiState === READY;;
 
   return (
     <>
@@ -166,10 +162,9 @@ const Home = () => {
                       disabled={loading}
                       label="Endpoint"
                       variant="outlined"
-                      defaultValue={endpoint}
+                      defaultValue={endpointStatus}
                       onChange={handleEndpointChange}
                     />
-                    <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onSetEndpoint}>Set</Button>
                   </Grid>
                   <Grid item sm={1} xs={12}>
                     <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>

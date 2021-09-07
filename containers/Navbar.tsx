@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRouter } from 'next/router';
+import { ApiPromise } from '@polkadot/api'
 import { WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -50,15 +51,16 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
 
   const { state: { keyring, keyringState, wallet, api, apiState }, dispatch } = useSubstrate();
   
-  async function loadAccount() {
+  async function loadAccount(api: ApiPromise) {
     // Get the list of accounts we possess the private key for
     const keyringOptions: Wallet[] = await Promise.all(keyring.getPairs().map(async (account: KeyringPair) => {
       const { address, meta }: any = account;
-      const { data: balance } = await api.query.system.account(address);
+      const { data }: any = await api.query.system.account(address);
+
       return {
         key: address,
         address,
-        balance: balance.free.toString(),
+        balance: data.free.toString(),
         name: meta.name.toUpperCase(),
         source: meta.source,
         isTesting: meta.isTesting,
@@ -83,8 +85,8 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
 
   React.useEffect(() => {
     console.log(keyringState, 'keyringState');
-    if(keyringState === READY && !wallet.address && apiState === READY) {
-      loadAccount();
+    if(keyringState === READY && !wallet.address && apiState === READY && api) {
+      loadAccount(api);
     }
   }, [keyringState, wallet, apiState]);
 

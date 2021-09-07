@@ -1,15 +1,7 @@
-import { handleActions } from 'redux-actions'
-import { ApiPromise } from '@polkadot/api'
+import { handleActions } from 'redux-actions';
+import { ApiPromise } from '@polkadot/api';
 import {
-  CONNECT_INIT,
-  CONNECT,
-  CONNECTING,
-  READY,
-  CONNECT_SUCCESS,
-  CONNECT_ERROR,
   LOAD_KEYRING,
-  LOADING,
-  ERROR,
   SET_KEYRING,
   KEYRING_ERROR,
   SELECT_ACCOUNT,
@@ -17,13 +9,22 @@ import {
   UPDATE_END_BLOCK,
   UPDATE_SEARCH_INPUT,
   UPDATE_SEARCH_STATE,
-  UPDATE_ENDPOINT_INPUT,
-} from './constants'
+
+  INIT,
+  LOADING,
+  ERROR,
+  READY,
+
+  CONNECT,
+  CONNECT_SUCCESS,
+  CONNECT_ERROR,
+  SWITCH_ENDPOINT,
+
+} from './constants';
 
 export type Filter = {
   startBlock: number;
   endBlock: number;
-  endpoint: string;
   searchInput: string;
   status: string;
 }
@@ -41,9 +42,11 @@ export type Wallet = {
 export type InitialStateType = {
   keyring: any;
   keyringState: any;
-  api: any;
+
+  api: null | ApiPromise;
   apiError: any;
-  apiState: any;
+  apiState: null | string;
+  endpoint: null | string;
 
   filter: Filter;
   wallet: Wallet;
@@ -56,15 +59,16 @@ export const initialState: InitialStateType = {
   // types: config.types,
   keyring: null,
   keyringState: null,
+
   api: null,
   apiError: null,
   apiState: null,
+  endpoint: null,
 
   /** new */
   filter: {
     startBlock: 0,
     endBlock: 0,
-    endpoint: process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rpc.polkadot.io',
     searchInput: '',
     status: READY,
   },
@@ -82,12 +86,21 @@ export const initialState: InitialStateType = {
 
 export default handleActions(
   {
-    [CONNECT_INIT]: (state: InitialStateType) => {
-      return { ...state, apiState: CONNECT_INIT };
+    /** connect to network */
+    // [CONNECT_INIT]: (state: InitialStateType) => {
+    //   return { ...state, apiState: INIT };
+    // },
+
+    [SWITCH_ENDPOINT]: (state: InitialStateType, {payload}: any) => {
+      const { input } = payload;
+      return Object.assign({}, state, {
+        apiState: INIT,
+        endpoint: input,
+      });
     },
 
     [CONNECT]: (state: InitialStateType, {payload}: {payload: {api: ApiPromise}}) => {
-      return { ...state, api: payload.api, apiState: CONNECTING };
+      return { ...state, api: payload.api, apiState: LOADING };
     },
 
     [CONNECT_SUCCESS]: (state: InitialStateType) => {
@@ -95,9 +108,10 @@ export default handleActions(
     },
 
     [CONNECT_ERROR]: (state: InitialStateType, {payload}: any) => {
-      return { ...state, apiState: CONNECT_ERROR, apiError: payload.err };
+      return { ...state, apiState: ERROR, apiError: payload.err };
     },
 
+    /** keyring */
     [LOAD_KEYRING]: (state: InitialStateType) => {
       return { ...state, keyringState: LOADING };
     },
@@ -109,6 +123,9 @@ export default handleActions(
     [SET_KEYRING]: (state: InitialStateType, {payload}: any) => {
       return { ...state, keyring: payload.keyring, keyringState: READY };
     },
+
+
+
 
     [SELECT_ACCOUNT]: (state: InitialStateType, {payload}: any) => {
       return { ...state, wallet: payload.wallet };
@@ -151,16 +168,6 @@ export default handleActions(
           ...state.filter,
           status: status,
           searchInput: status === LOADING ? '' : state.filter.searchInput,
-        },
-      });
-    },
-    
-    [UPDATE_ENDPOINT_INPUT]: (state: InitialStateType, {payload}: any) => {
-      const { input } = payload;
-      return Object.assign({}, state, {
-        filter: {
-          ...state.filter,
-          endpoint: input,
         },
       });
     },

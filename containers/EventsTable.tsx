@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as JsSearch from 'js-search';
+import { ApiPromise } from '@polkadot/api'
 import concat from 'lodash/concat';
 import parseInt from 'lodash/parseInt';
 import { makeStyles } from '@material-ui/core/styles';
@@ -41,11 +42,11 @@ const EventsTable = () => {
 
   const [events, setEvents] = React.useState<Block[]>([]);
 
-  const { state: { api, filter }, dispatch} = useSubstrate();
+  const { state: { api, apiState, filter }, dispatch} = useSubstrate();
 
-  const loading = filter.status === LOADING;
+  const loading = filter.status === LOADING && apiState === READY;
 
-  function showEventsOnBlock(block: number) {
+  function showEventsOnBlock(block: number, api: ApiPromise) {
     return new Promise(async (resolve, reject) => {
       // // no blockHash is specified, so we retrieve the latest
       // const signedBlock = await api.rpc.chain.getBlock();
@@ -74,10 +75,10 @@ const EventsTable = () => {
     });
   }
 
-  const onScan = async () => {
+  const onScan = async (api: ApiPromise) => {
     let list: Block[] = [];
     for(let i = parseInt(`${filter.startBlock}`); i <= parseInt(`${filter.endBlock}`); i += 1) {
-      const l = await showEventsOnBlock(i);
+      const l = await showEventsOnBlock(i, api);
       list = (concat(l, list) as Block[]);
     }
     dispatch(updateSearchState(READY));
@@ -99,10 +100,10 @@ const EventsTable = () => {
   }
 
   React.useEffect(() => {
-    if(loading) {
-      onScan();
+    if(loading && apiState === READY && api) {
+      onScan(api);
     }
-  }, [loading, updateSearchState]);
+  }, [loading, apiState, api, updateSearchState]);
 
   React.useEffect(() => {
     if(searchApi) {

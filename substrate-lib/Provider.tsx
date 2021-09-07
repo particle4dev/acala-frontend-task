@@ -3,30 +3,33 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import keyring from '@polkadot/ui-keyring';
 import { useSnackbar, SnackbarMessage, OptionsObject, SnackbarKey } from 'notistack';
 import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { connectInit, connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
+import { connectNetwork, connectSuccess, connectError, loadKeyring, setKeyring, keyringError } from './actions';
+import { INIT, READY } from './constants';
 import SubstrateContext from './Context';
 import reducer, { initialState, InitialStateType } from './reducer';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const debug = require('debug')('substrate-lib:SubstrateProvider');
 
-const connect = (state: InitialStateType, dispatch: any, force: boolean = false, enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey) => {
+const connect = (state: InitialStateType, dispatch: any, enqueueSnackbar: (message: SnackbarMessage, options?: OptionsObject) => SnackbarKey) => {
   // const { apiState, socket, jsonrpc, types } = state;
-  const { apiState, filter } = state;
+  const { apiState, api, endpoint } = state;
   // We only want this function to be performed once
-  if (apiState && !force) return;
+  if (apiState === READY && api) {
+    api.disconnect();
+  }
 
-  dispatch(connectInit());
-  enqueueSnackbar(`Connecting to ${filter.endpoint} ...`, {
+  enqueueSnackbar(`Connecting to ${endpoint} ...`, {
     anchorOrigin: {
       vertical: 'top',
       horizontal: 'right',
     }
   });
+
   // const provider = new WsProvider(socket);
   // const _api = new ApiPromise({ provider, types, rpc: jsonrpc });
   // const wsProvider = new WsProvider("ws://workspace.particle4dev.com:9944");
-  const wsProvider = new WsProvider(filter.endpoint);  
+  const wsProvider = new WsProvider(endpoint as string);  
   const _api = new ApiPromise({ provider: wsProvider });
 
   // Set listeners for disconnection and reconnection event.
@@ -37,9 +40,10 @@ const connect = (state: InitialStateType, dispatch: any, force: boolean = false,
       dispatch(connectSuccess());
     });
   });
+
   _api.on('ready', () => {
     dispatch(connectSuccess());
-    enqueueSnackbar(`Connected to ${filter.endpoint} successful!`, {
+    enqueueSnackbar(`Connected to ${endpoint} successful!`, {
       variant: 'success',
       anchorOrigin: {
         vertical: 'top',
@@ -47,8 +51,18 @@ const connect = (state: InitialStateType, dispatch: any, force: boolean = false,
       }
     });
   });
+
   _api.on('error', (err: any) => {
+    // console.log(apiState, 'apiState');
+    // api.disconnect();
     dispatch(connectError(err));
+    enqueueSnackbar(`Connected to ${endpoint} failed!`, {
+      variant: 'error',
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right',
+      }
+    });
   });
 };
 
@@ -118,19 +132,21 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
 
   const { enqueueSnackbar } = useSnackbar();
 
-  const endpointRef = React.useRef<null | string>(null);
+  React.useEffect(() => {
+    if(state.apiState === INIT) {
+      connect(state, dispatch, enqueueSnackbar);
+    }
+  }, [state.apiState]);
 
   React.useEffect(() => {
-    connect(state, dispatch, endpointRef.current !== state.filter.endpoint, enqueueSnackbar);
     loadAccounts(state, dispatch, enqueueSnackbar);
-    endpointRef.current = state.filter.endpoint;
-  }, [state.filter.endpoint]);
+  }, []);
 
   const contextValue: any = React.useMemo(() => {
     return { state, dispatch };
   }, [state, dispatch]);
 
-  console.log(state, 'state');
+  // console.log(state, 'SubstrateProvider.state');
 
   return (
     <SubstrateContext.Provider value={contextValue}>
