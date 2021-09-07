@@ -3,14 +3,12 @@ import {TextFieldProps} from '@material-ui/core/TextField';
 
 const debug = require('debug')('components:validate');
 
-type Props = Omit<TextFieldProps, 'onChange'> & {
-  onChange?: (value: any) => void;
-  defaultValue?: any;
+type Props = Omit<TextFieldProps, 'onError'> & {
+  onError: (error?: Error) => void;
 }
 
 interface State {
   error: string;
-  value: string;
 }
 
 export default function validate(
@@ -21,45 +19,25 @@ export default function validate(
   }
 ) {
   // eslint-disable-next-line react/display-name
-  return class extends React.PureComponent<Props, State> {
+  return class extends React.Component<Props, State> {
     constructor(props: Props) {
       super(props);
       debug('constructor');
 
       this.state = {
         error: '',
-        value: props.defaultValue || '',
       };
     }
 
-    // Event type for input
-    public handleChange = (evt: React.FormEvent<HTMLInputElement>) => {
-      evt.preventDefault();
-      const { value } = evt.currentTarget;
-      if (options.onChange) {
-        this.setState(
-          {
-            value,
-          },
-          this.setErrors
-        );
-      } else {
-        this.setState({
-          value,
-        });
+    componentDidUpdate(prevProps: Props) {
+      // Typical usage (don't forget to compare props):
+      if (this.props.value !== prevProps.value) {
+        this.runValidations();
       }
-    };
-
-    public reset = () => {
-      this.setState({
-        error: '',
-        value: '',
-      });
-    };
-
-    public setErrors = async () => {
-      const { onChange } = this.props;
-      const { value } = this.state;
+    }
+    
+    async runValidations() {
+      const { value, onError } = this.props;
       try {
         for (const validation of validations) {
           await validation(value, this.props);
@@ -67,71 +45,26 @@ export default function validate(
         this.setState({
           error: '',
         });
+        onError();
       } catch (err) {
         this.setState({
           error: (err as Error).message,
         });
-      } finally {
-        if (onChange) {
-          onChange(value);
+        if(onError) {
+          onError(err as Error);
         }
       }
-    };
-
-    public setValue = async (value: any) => {
-      try {
-        for (const validation of validations) {
-          await validation(value, this.props);
-        }
-        this.setState({
-          error: '',
-          value,
-        });
-        return true;
-      } catch (err) {
-        this.setState({
-          error: (err as Error).message,
-        });
-        // continue throw error
-        throw err;
-      }
-    };
-
-    public value = async () => {
-      const { value } = this.state;
-      try {
-        for (const validation of validations) {
-          await validation(value, this.props);
-        }
-        this.setState({
-          error: '',
-        });
-        return value;
-      } catch (err) {
-        this.setState({
-          error: (err as Error).message,
-        });
-        // continue throw error
-        throw err;
-      }
-    };
-
-    public rawvalue = () => {
-      const { value } = this.state;
-      return value;
-    };
+    }
 
     public render() {
       debug(`render`);
 
-      const { value, error } = this.state;
-      const { defaultValue, ...props } = this.props;
+      const { error } = this.state;
+      const { onError, ...props } = this.props;
 
       return (
         <WrappedComponent
           {...props}
-          onChange={this.handleChange}
-          value={value}
           error={error}
           isError={error !== ''}
         />

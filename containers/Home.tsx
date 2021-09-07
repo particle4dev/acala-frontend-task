@@ -17,26 +17,24 @@ import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar'
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import validate from '../components/Form/validate';
-import { requiredNumber } from '../components/Form/helper';
+import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import EventsTable from './EventsTable';
 
-const TextInput = ({ onChange, value, error, isError, ...props }: any) => (
+const TextInput = ({ error, isError, ...props }: any) => (
   <TextField
     variant="outlined"
     margin="none"
     error={isError}
     helperText={error}
-    value={value}
-    onChange={onChange}
     {...props}
   />
 );
 
-const ValidationStartBlockInput = validate(TextInput, [requiredNumber], {
+const ValidationStartBlockInput = validate(TextInput, [requiredNumber, greaterThanZero], {
   onChange: true,
 });
 
-const ValidationEndBlockInput = validate(TextInput, [requiredNumber], {
+const ValidationEndBlockInput = validate(TextInput, [requiredNumber, greaterThanZero], {
   onChange: true,
 });
 
@@ -86,23 +84,70 @@ const Home = () => {
   const { state: { filter, endpoint, apiState }, dispatch} = useSubstrate();
 
   const [endpointStatus, setEndpoint] = React.useState<string>(endpoint || '');
+  const [sendButtonState, setSendButtonState] = React.useState({
+    startBlock: true,
+    endBlock: true,
+    endpoint: true,
+  });
 
-  const handleStartBlockChange = (value: number) => {
+  const handleStartBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // if(isNumber(event.target.value))
-    dispatch(updateStartBlock(value));
+    dispatch(updateStartBlock(event.target.value));
   };
 
-  const handleEndBlockChange = (value: number) => {
+  const onErrorStartBlockChange = (error?: Error) => {
+    if(error) {
+      setSendButtonState({
+        ...sendButtonState,
+        startBlock: false,
+      }); 
+    } else {
+      setSendButtonState({
+        ...sendButtonState,
+        startBlock: true,
+      }); 
+    }
+  };
+
+  const handleEndBlockChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // if(isNumber(event.target.value))
-    dispatch(updateEndBlock(value));
+    dispatch(updateEndBlock(event.target.value));
+  };
+
+  const onErrorEndBlockChange = (error?: Error) => {
+    if(error) {
+      setSendButtonState({
+        ...sendButtonState,
+        endBlock: false,
+      }); 
+    } else {
+      setSendButtonState({
+        ...sendButtonState,
+        endBlock: true,
+      }); 
+    }
   };
 
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(updateSearchInput(event.target.value));
   };
 
-  const handleEndpointChange = (value: string) => {
-    setEndpoint(value);
+  const handleEndpointChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEndpoint(event.target.value);
+  };
+
+  const onErrorEndpointChange = (error?: Error) => {
+    if(error) {
+      setSendButtonState({
+        ...sendButtonState,
+        endpoint: false,
+      }); 
+    } else {
+      setSendButtonState({
+        ...sendButtonState,
+        endpoint: true,
+      }); 
+    }
   };
 
   const onScan = async () => {
@@ -140,8 +185,9 @@ const Home = () => {
                       disabled={loading}
                       label="Start Block"
                       variant="outlined"
-                      defaultValue={`${filter.startBlock}`}
+                      value={`${filter.startBlock}`}
                       onChange={handleStartBlockChange}
+                      onError={onErrorStartBlockChange}
                     />
                   </Grid>
                   <Grid item sm={3} xs={12}>
@@ -150,8 +196,9 @@ const Home = () => {
                       disabled={loading}
                       label="End Block"
                       variant="outlined"
-                      defaultValue={`${filter.endBlock}`}
+                      value={`${filter.endBlock}`}
                       onChange={handleEndBlockChange}
+                      onError={onErrorEndBlockChange}
                     />
                   </Grid>
                   <Grid item sm={5} xs={12}>
@@ -160,12 +207,22 @@ const Home = () => {
                       disabled={loading}
                       label="Endpoint"
                       variant="outlined"
-                      defaultValue={endpointStatus}
+                      value={endpointStatus}
                       onChange={handleEndpointChange}
+                      onError={onErrorEndpointChange}
                     />
                   </Grid>
                   <Grid item sm={1} xs={12}>
-                    <Button disableElevation className={classes.scanButton} disabled={loading} variant="contained" color="primary" onClick={onScan}>Scan</Button>
+                    <Button 
+                      disableElevation
+                      className={classes.scanButton}
+                      disabled={loading || !sendButtonState.startBlock || !sendButtonState.endBlock || !sendButtonState.endpoint}
+                      variant="contained"
+                      color="primary"
+                      onClick={onScan}
+                    >
+                      Scan
+                    </Button>
                   </Grid>
                   <Grid item sm={6} xs={12}>
                     <TextField

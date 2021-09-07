@@ -151,7 +151,7 @@ const SubstrateProvider = ({ children }: SubstrateProviderProps) => {
     return { state, dispatch };
   }, [state, dispatch]);
 
-  console.log(state, 'SubstrateProvider.state');
+  // console.log(state, 'SubstrateProvider.state');
 
   return (
     <SubstrateContext.Provider value={contextValue}>

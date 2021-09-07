@@ -17,3 +17,12 @@ export const requiredNumber = (value: any) =>
     }
     return resolve(true);
   });
+
+export const greaterThanZero = (value: any) =>
+  new Promise((resolve, reject) => {
+    const n = Number(value);
+    if(n < 0) {
+      return reject(new Error('Number greater than zero'));
+    }
+    return resolve(true);
+  });
