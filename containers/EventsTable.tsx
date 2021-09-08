@@ -283,7 +283,7 @@ const EventsTable = () => {
       rowsPerPage={rowsPerPage}
       page={page}
       onPageChange={handleChangePage}
-      labelDisplayedRows={({ from, to, count }) => `${parseInt(`${filter.startBlock}`) + from} - ${ parseInt(`${filter.startBlock}`) + to} of ${count}`}
+      labelDisplayedRows={({ from, to, count }) => `${parseInt(`${filter.startBlock}`) + from - 1} - ${parseInt(`${filter.startBlock}`) + to - 1} of ${count}`}
     />
     </>
   )

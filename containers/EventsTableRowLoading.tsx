@@ -22,7 +22,7 @@ const EventsTableRowLoading = React.forwardRef(function EventsTableRowLoading({ 
   return (
     <TableRow ref={ref} hover className={classes.tableRow}>
       <TableCell component="th" scope="row">
-        <PlaceholderLine width={160} />
+        <PlaceholderLine width={120} />
       </TableCell>
       <TableCell>
         <PlaceholderLine width={190} />
