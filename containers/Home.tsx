@@ -1,6 +1,5 @@
 import * as React from 'react';
 // import isNumber from 'lodash/isNumber';
-import { useSubstrate, updateStartBlock, updateEndBlock, updateSearchInput, updateSearchState, switchEndpoint, LOADING, READY } from '../substrate-lib'
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
@@ -19,6 +18,19 @@ import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import EventsTable from './EventsTable';
+import {
+  useSubstrate,
+  LOADING,
+  READY
+} from "polkadot-react-provider";
+import {
+  useSubstrate as useHomeContext,
+  updateStartBlock,
+  updateEndBlock,
+  updateSearchInput,
+  updateSearchState,
+  switchEndpoint,
+} from '../home-context';
 
 const TextInput = ({ error, isError, ...props }: any) => (
   <TextField
@@ -81,7 +93,9 @@ const useStyles = makeStyles((theme: Theme) =>
 const Home = () => {
   const classes = useStyles();
 
-  const { state: { filter, endpoint, apiState }, dispatch} = useSubstrate();
+  const { state: { apiState, endpoint, api }} = useSubstrate();
+
+  const { state: { filter }, dispatch} = useHomeContext();
 
   const [endpointStatus, setEndpoint] = React.useState<string>(endpoint || '');
   const [sendButtonState, setSendButtonState] = React.useState({
@@ -157,7 +171,19 @@ const Home = () => {
     dispatch(updateSearchState(LOADING));
   }
 
-  const loading = filter.status === LOADING && apiState === READY;;
+  const updateEndBlockInput = async () => {
+    const signedBlock = await api.rpc.chain.getBlock();
+    const blockNumber = signedBlock.block.header.number.toNumber();
+    dispatch(updateEndBlock(blockNumber));
+  }
+  
+  React.useEffect(() => {
+    if(filter.endBlock === null && apiState === READY) {
+      updateEndBlockInput();
+    }
+  }, [apiState, filter]);
+
+  const loading = filter.status === LOADING && apiState === READY;
 
   return (
     <>

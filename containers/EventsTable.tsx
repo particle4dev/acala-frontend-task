@@ -13,7 +13,11 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import TablePagination from '@material-ui/core/TablePagination';
 import Typography from '@material-ui/core/Typography';
 import { EventRecord } from '@polkadot/types/interfaces';
-import { useSubstrate, updateSearchState, LOADING, READY } from '../substrate-lib'
+import { useSubstrate, LOADING, READY } from "polkadot-react-provider";
+import { 
+  useSubstrate as useHomeContext, 
+  updateSearchState
+} from '../home-context';
 import EventsTableRowLoading from './EventsTableRowLoading';
 
 type Block = {
@@ -145,7 +149,8 @@ const EventsTable = () => {
 
   const [ events, setEvents ] = React.useState<Block[]>([]);
 
-  const { state: { api, apiState, filter }, dispatch} = useSubstrate();
+  const { state: { api, apiState }} = useSubstrate();
+  const { state: { filter }, dispatch} = useHomeContext();
 
   const loading = filter.status === LOADING && apiState === READY;
 

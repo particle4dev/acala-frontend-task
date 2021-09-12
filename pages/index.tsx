@@ -2,11 +2,15 @@ import * as React from 'react';
 import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import {
+  useSnackbar,
+} from 'notistack';
+import {
   INIT,
   LOADING,
+  READY,
   useSubstrate,
   switchEndpoint,
-} from '../substrate-lib';
+} from "polkadot-react-provider";
 import SimpleBackdrop from '../components/SimpleBackdrop';
 import ProgressBar from '../components/ProgressBar';
 
@@ -15,10 +19,47 @@ const HomeWithNoSSR = dynamic(
   { ssr: false }
 );
 
+const anchorOrigin = {
+  vertical: 'top',
+  horizontal: 'right',
+};
+
 const Index: NextPage = () => {  
-  const { state: { apiState, keyringState }, dispatch} = useSubstrate();
+  const { state: { apiState, keyringState, endpoint }, dispatch} = useSubstrate();
 
   const loading = apiState === INIT || apiState === LOADING || keyringState === LOADING;
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  React.useEffect(() => {
+    if(apiState === INIT) {
+      enqueueSnackbar(`Connecting to ${endpoint} ...`, {
+        anchorOrigin,
+      });
+    }
+  
+    if(apiState === READY) {
+      enqueueSnackbar(`Connected to ${endpoint} successful!`, {
+        variant: 'success',
+        anchorOrigin,
+      });
+    }
+  }, [apiState]);
+
+  React.useEffect(() => {
+    if(keyringState === INIT) {
+      enqueueSnackbar(`Loading accounts ...`, {
+        anchorOrigin,
+      });
+    }
+  
+    if(keyringState === READY) {
+      enqueueSnackbar(`Loaded accounts successful!`, {
+        variant: 'success',
+        anchorOrigin,
+      });
+    }
+  }, [keyringState]);
 
   React.useEffect(() => {
     if(apiState === null) {

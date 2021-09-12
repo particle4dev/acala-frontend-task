@@ -1,15 +1,16 @@
 import * as React from "react";
-import { useRouter } from 'next/router';
-import { ApiPromise } from '@polkadot/api'
 import { WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
+import values from 'lodash/values';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Identicon from '@polkadot/react-identicon';
-import type { KeyringPair } from '@polkadot/keyring/types';
-import { useSubstrate, selectAccount, Wallet, READY } from '../substrate-lib'
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Fade from '@material-ui/core/Fade';
+import { useSubstrate, switchAddress, Address, READY } from "polkadot-react-provider";
 import ToolbarSection from '../components/ToolbarSection';
 
 // size (optional) is a number, indicating the size (in pixels, 64 as default)
@@ -49,45 +50,38 @@ export type NavbarProps = WithStyles<typeof styles> & {
 function Navbar({ children, classes, title, style }: NavbarProps) {
   debug('render');
 
-  const { state: { keyring, keyringState, wallet, api, apiState }, dispatch } = useSubstrate();
+  const { state: { keyringState, apiState, api, addresses, address }, dispatch } = useSubstrate();
   
-  async function loadAccount(api: ApiPromise) {
-    // Get the list of accounts we possess the private key for
-    const keyringOptions: Wallet[] = await Promise.all(keyring.getPairs().map(async (account: KeyringPair) => {
-      const { address, meta }: any = account;
-      const { data }: any = await api.query.system.account(address);
+  const [balance, setBalance] = React.useState<null | string>(null); 
 
-      return {
-        key: address,
-        address,
-        balance: data.free.toString(),
-        name: meta.name.toUpperCase(),
-        source: meta.source,
-        isTesting: meta.isTesting,
-        isInjected: meta.isInjected,
-      }
-    }));
-
-    if(keyringOptions.length > 0) {
-      dispatch(selectAccount(keyringOptions[0]));
-    }
-  }
-  
   // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
   
-  const router = useRouter();
+  const isLoggedIn = keyringState === READY && address;
 
-  function gotoLoginPage() {
-    router.push('/login');
+  async function loadBalace(address: string) {
+    const { data }: any = await api.query.system.account(address);
+    setBalance(data.free.toString());
   }
 
-  const isLoggedIn = keyringState === READY && wallet.address;
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = (e: React.SyntheticEvent) => {
+    const target = e.target as HTMLElement;
+    const value = target.getAttribute('data-value');
+    dispatch(switchAddress(value));
+    setAnchorEl(null);
+  };
 
   React.useEffect(() => {
-    if(keyringState === READY && !wallet.address && apiState === READY && api) {
-      loadAccount(api);
+    if(api && address && apiState === READY) {
+      loadBalace(address);
     }
-  }, [keyringState, wallet, apiState]);
+  }, [balance, address, api]);
 
   return (
     <AppBar
@@ -120,9 +114,8 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                   textAlign: 'right',
                 }}
               >
-                {wallet.name}
+                {addresses[address as string].name}
               </Typography>
-
               <Typography
                 component="div"
                 variant="caption"
@@ -131,18 +124,31 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                   lineHeight: 1.2,
                 }}
               >
-                {wallet.balance}
+                {balance || 0}
               </Typography>
             </div>
-            <IconButton color="inherit">
+            <IconButton color="inherit" onClick={handleClick}>
               <Identicon
-                className="h-8 w-8 rounded-full"
-                value={wallet.address}
+                aria-controls="fade-menu"
+                aria-haspopup="true"
+                value={address}
                 size={size}
                 theme={theme}
               />
             </IconButton>
-          </> : <Button variant="contained" color="primary" disableElevation onClick={gotoLoginPage}>
+            <Menu
+              id="fade-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={open}
+              onClose={handleClose}
+              TransitionComponent={Fade}
+            >
+              {values(addresses).map(({ key, address }: Address) => (
+                <MenuItem key={`navbar-menu-item-${key}`} data-value={address} onClick={handleClose}>{address}</MenuItem>
+              ))}
+            </Menu>
+          </> : <Button variant="contained" color="primary" disableElevation>
             Login
           </Button>}
         </ToolbarSection>
