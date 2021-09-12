@@ -17,11 +17,6 @@ import {
 } from './constants';
 import { Wallet } from './reducer';
 
-
-
-
-
-
 export const loadKeyring = createAction(LOAD_KEYRING);
 
 export const keyringError = createAction(KEYRING_ERROR);
