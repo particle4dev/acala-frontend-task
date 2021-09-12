@@ -1,4 +1,4 @@
-# acala-frontend-task
+# Polkadot Scanner
 
 ## Getting Started
 
