@@ -7,8 +7,11 @@ import { Header } from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
 import {
   useSubstrate,
-  READY
+  READY,
+  LOADING,
+  INIT,
 } from "polkadot-react-provider";
+import PlaceholderLine from './PlaceholderLine';
 
 const debug = require('debug')('components:LastBlock');
 
@@ -53,14 +56,17 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
     };
   }, [apiState, api]);
 
+  const loading = apiState === INIT || apiState === LOADING || lastBlock === '';
+
   return <Card ref={ref} className={className} style={style} variant="outlined">
     <CardContent>
       <Typography variant="h5" gutterBottom>
         Last block
       </Typography>
-      <Typography variant="subtitle1" gutterBottom>
+      {!loading && <Typography variant="subtitle1">
         #{lastBlock}
-      </Typography>
+      </Typography>}
+      {loading && <PlaceholderLine width={120} />}
     </CardContent>
   </Card>;
 });
