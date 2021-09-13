@@ -14,8 +14,9 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Navbar from './Navbar';
 import Section from '../components/Section';
 import Content from '../components/Content';
-import ProgressBar from '../components/ProgressBar'
+import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
+import LastBlock from '../components/LastBlock';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import EventsTable from './EventsTable';
@@ -197,10 +198,15 @@ const Home = () => {
         <SectionSpacingBottom />
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h4" gutterBottom>
               Overview
             </Typography>
           </Grid>
+          <Grid item sm={3} xs={12}>
+            <LastBlock />
+          </Grid>
+
+          <SectionSpacingBottom />
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
