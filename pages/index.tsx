@@ -3,6 +3,7 @@ import type { NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import {
   useSnackbar,
+  SnackbarOrigin,
 } from 'notistack';
 import {
   INIT,
@@ -19,7 +20,7 @@ const HomeWithNoSSR = dynamic(
   { ssr: false }
 );
 
-const anchorOrigin = {
+const anchorOrigin: SnackbarOrigin = {
   vertical: 'top',
   horizontal: 'right',
 };

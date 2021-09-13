@@ -1,5 +1,6 @@
 import * as React from "react";
 import { WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
+import { ApiPromise } from '@polkadot/api';
 import values from 'lodash/values';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -58,7 +59,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   
   const isLoggedIn = keyringState === READY && address;
 
-  async function loadBalace(address: string) {
+  async function loadBalace(address: string, api: ApiPromise) {
     const { data }: any = await api.query.system.account(address);
     setBalance(data.free.toString());
   }
@@ -73,13 +74,15 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   const handleClose = (e: React.SyntheticEvent) => {
     const target = e.target as HTMLElement;
     const value = target.getAttribute('data-value');
-    dispatch(switchAddress(value));
+    if(value) {
+      dispatch(switchAddress(value));
+    }
     setAnchorEl(null);
   };
 
   React.useEffect(() => {
     if(api && address && apiState === READY) {
-      loadBalace(address);
+      loadBalace(address, api);
     }
   }, [balance, address, api]);
 

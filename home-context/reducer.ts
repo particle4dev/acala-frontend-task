@@ -4,7 +4,6 @@ import {
   UPDATE_END_BLOCK,
   UPDATE_SEARCH_INPUT,
   UPDATE_SEARCH_STATE,
-
   LOADING,
   READY,
 } from './constants';

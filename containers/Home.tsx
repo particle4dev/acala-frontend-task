@@ -1,6 +1,7 @@
 import * as React from 'react';
 // import isNumber from 'lodash/isNumber';
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { ApiPromise } from '@polkadot/api';
 // import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -21,7 +22,8 @@ import EventsTable from './EventsTable';
 import {
   useSubstrate,
   LOADING,
-  READY
+  READY,
+  switchEndpoint
 } from "polkadot-react-provider";
 import {
   useSubstrate as useHomeContext,
@@ -29,7 +31,6 @@ import {
   updateEndBlock,
   updateSearchInput,
   updateSearchState,
-  switchEndpoint,
 } from '../home-context';
 
 const TextInput = ({ error, isError, ...props }: any) => (
@@ -171,17 +172,17 @@ const Home = () => {
     dispatch(updateSearchState(LOADING));
   }
 
-  const updateEndBlockInput = async () => {
+  const updateEndBlockInput = async (api: ApiPromise) => {
     const signedBlock = await api.rpc.chain.getBlock();
     const blockNumber = signedBlock.block.header.number.toNumber();
     dispatch(updateEndBlock(blockNumber));
   }
   
   React.useEffect(() => {
-    if(filter.endBlock === null && apiState === READY) {
-      updateEndBlockInput();
+    if(filter.endBlock === null && apiState === READY && api) {
+      updateEndBlockInput(api);
     }
-  }, [apiState, filter]);
+  }, [apiState, filter, api]);
 
   const loading = filter.status === LOADING && apiState === READY;
 
