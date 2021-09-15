@@ -19,32 +19,31 @@ import {
 } from "polkadot-react-provider";
 import PlaceholderLine from './PlaceholderLine';
 
-function toShortAddress (_address?: AccountId | AccountIndex | Address | string | null | Uint8Array): string {
+const debug = require('debug')('components:LastTransfers');
+
+function toShortAddress(_address?: AccountId | AccountIndex | Address | string | null | Uint8Array, length: number = 15): string {
   const address = (_address || '').toString();
 
+  const start = length - 3 - 3;
+
   return (address.length > 13)
-    ? `${address.slice(0, 6)}…${address.slice(-6)}`
+    ? `${address.slice(0, start)}…${address.slice(-3)}`
     : address;
 }
 
-const debug = require('debug')('components:LastTransfers');
+type Transaction = {
+  block_number: string;
+  from: string;
+  hash: string;
+  to: string;
+  amount: string;
+  token: string;
+}
 
 export type LastTransfersProps = {
   readonly style?: React.CSSProperties;
   readonly className?: string;
 }
-
-function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
 
 const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfersProps, ref: React.Ref<HTMLElement>) {
   debug('render');
@@ -52,7 +51,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
   
   const { state: { apiState, api }} = useSubstrate();
 
-  const [ lastTransfers, setLastTransfers ] = React.useState<any>([]);
+  const [ lastTransfers, setLastTransfers ] = React.useState<Transaction[]>([]);
 
   function loadLastTransfers(api: ApiPromise) {
     // Subscribe to the new headers on-chain. The callback is fired when new headers
@@ -63,6 +62,8 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
 
       const blockHash = await api.rpc.chain.getBlockHash(header.number);
       const signedBlock = await api.rpc.chain.getBlock(blockHash);
+      const newTxs: Transaction[] = [];
+
       signedBlock.block.extrinsics.forEach((ex, index: number) => {
         // the extrinsics are decoded by the API, human-like view
         // console.log(index, ex.toHuman());
@@ -79,41 +80,14 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
           });
         }
         if(section === 'balances' && method.includes('transfer')) {
-          // console.log(`${section}.${method}`, args);
-          // console.log({
-          //   block_number: header.number.toString(),
-          //   from: signer.toString(),
-          //   to: args[0].toString(),
-          //   amount: args[1].toString(),
-          //   token: 'network.tokenSymbol'
-          // });
-          setLastTransfers((pre: any) => ([
-            {
-              block_number: header.number.toString(),
-              from: signer.toString(),
-              hash: hash.toString(),
-              to: args[0].toString(),
-              amount: args[1].toString(),
-              token: 'network.tokenSymbol'
-            },
-            ...pre.slice(0, 9)
-          ]));
-          // {
-            //   block_number: transfer.block_number,
-            //   from: transfer.signer,
-          //   hash: transfer.hash,
-          //   to: JSON.parse(transfer.args)[0].address20
-          //     ? JSON.parse(transfer.args)[0].address20
-          //     : JSON.parse(transfer.args)[0].id,
-          //   amount:
-          //     transfer.section === 'currencies'
-          //       ? JSON.parse(transfer.args)[2]
-          //       : JSON.parse(transfer.args)[1],
-          //   token:
-          //     transfer.section === 'currencies'
-          //       ? JSON.parse(transfer.args)[1].token
-          //       : network.tokenSymbol,
-          // }
+          newTxs.push({
+            block_number: header.number.toString(),
+            from: signer.toString(),
+            hash: hash.toString(),
+            to: args[0].toString(),
+            amount: args[1].toString(),
+            token: api.registry.chainTokens[0]
+          });
         }
         // explicit display of name, args & documentation
         // console.log(meta.documentation.map((d) => d.toString()).join('\n'));
@@ -130,6 +104,15 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
         //   console.log(`signer=${ex.signer.toString()}, nonce=${ex.nonce.toString()}`);
         // }
       });
+
+      if(newTxs.length > 0) {
+        console.log(newTxs, 'newTxs');
+        setLastTransfers((pre: Transaction[]) => ([
+          ...newTxs,
+          ...pre.slice(0, 10 - newTxs.length)
+        ]));
+      }
+      
     });
     return unsubscribeWrap;
   }
@@ -153,8 +136,6 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
 
   const loading = apiState === INIT || apiState === LOADING || lastTransfers.length === 0;
 
-  console.log(api.registry, 'api.registry');
-
   return <Card ref={ref} className={className} style={style} variant="outlined">
     <CardContent>
       <Typography variant="h5" gutterBottom>
@@ -164,7 +145,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
 
       <Table aria-label="simple table">
         <TableBody>
-          {lastTransfers.map((row: any, index: number) => (
+          {lastTransfers.map((row: Transaction, index: number) => (
             <TableRow key={`${row.block_number}${index}`}>
               <TableCell component="th" scope="row" style={{
                 paddingLeft: 0,
@@ -177,19 +158,19 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
                   {`${row.hash.slice(0, 6)}...`}
                 </Typography>
                 <Typography variant="caption">
-                  45 secs ago
+                  #{row.block_number}
                 </Typography>
               </TableCell>
               <TableCell>
                 <Typography variant="subtitle1">
-                  From: {toShortAddress(row.from)}
+                  From: {toShortAddress(row.from, 16)}
                 </Typography>
                 <Typography variant="subtitle1">
-                  To: {toShortAddress(row.to)}
+                  To: {toShortAddress(row.to, 16)}
                 </Typography>
               </TableCell>
               <TableCell align="right">
-                {formatBalance(row.amount, { withSi: false, forceUnit: '-' }, api.registry.chainDecimals[0])} {api.registry.chainTokens[0]}
+                {formatBalance(row.amount, { withSi: false, forceUnit: '-' }, api.registry.chainDecimals[0])} {row.token}
               </TableCell>
             </TableRow>
           ))}

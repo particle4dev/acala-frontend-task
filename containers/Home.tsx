@@ -203,17 +203,10 @@ const Home = () => {
               Overview
             </Typography>
           </Grid>
+ 
           <Grid item sm={3} xs={12}>
             <LastBlock />
           </Grid>
-
-          <Grid item xs={12}></Grid>
-
-          <Grid item sm={6} xs={12}>
-            <LastTransfers />
-          </Grid>
-
-          <SectionSpacingBottom />
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
@@ -285,10 +278,16 @@ const Home = () => {
                 </Grid>
               </div>
               <EventsTable />
+
               <SectionSpacingBottom />
 
             </TableContainer>
           </Grid>
+
+          <Grid item sm={6} xs={12}>
+            <LastTransfers />
+          </Grid>
+
         </Grid>
 
       </Section>
