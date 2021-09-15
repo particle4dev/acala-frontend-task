@@ -5,6 +5,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { Header } from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
+import { formatNumber } from '@polkadot/util';
 import {
   useSubstrate,
   READY,
@@ -32,8 +33,9 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
     // Subscribe to the new headers on-chain. The callback is fired when new headers
     // are found, the call itself returns a promise with a subscription that can be
     // used to unsubscribe from the newHead subscription
-    const unsubscribeWrap = api.rpc.chain.subscribeNewHeads((header: Header) => {
+    const unsubscribeWrap = api.derive.chain.subscribeNewHeads((header: Header) => {
       debug(`Chain is at block: #${header.number}`);
+      console.log(header, 'header zzz', `${header.author}`);
       setLastBlock(`${header.number}`);
     });
     return unsubscribeWrap;
@@ -64,7 +66,7 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
         Last block
       </Typography>
       {!loading && <Typography variant="subtitle1">
-        #{lastBlock}
+        #{formatNumber(lastBlock)}
       </Typography>}
       {loading && <PlaceholderLine width={120} />}
     </CardContent>
