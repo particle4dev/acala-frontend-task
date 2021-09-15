@@ -58,9 +58,9 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
     // are found, the call itself returns a promise with a subscription that can be
     // used to unsubscribe from the newHead subscription
     const unsubscribeWrap = api.derive.chain.subscribeNewHeads(async (header: Header) => {
-      debug(`Chain is at block: #${header.number} ${header.author}`);
+      debug(`Chain is at block: #${header.number}`);
 
-      const blockHash = await api.rpc.chain.getBlockHash(header.number);
+      const blockHash = await api.rpc.chain.getBlockHash(header.number.toNumber());
       const signedBlock = await api.rpc.chain.getBlock(blockHash);
       const newTxs: Transaction[] = [];
 
@@ -136,6 +136,8 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
 
   const loading = apiState === INIT || apiState === LOADING || lastTransfers.length === 0;
 
+  const decimal = api!.registry!.chainDecimals[0] || 10;
+
   return <Card ref={ref} className={className} style={style} variant="outlined">
     <CardContent>
       <Typography variant="h5" gutterBottom>
@@ -170,7 +172,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
                 </Typography>
               </TableCell>
               <TableCell align="right">
-                {formatBalance(row.amount, { withSi: false, forceUnit: '-' }, api.registry.chainDecimals[0])} {row.token}
+                {formatBalance(row.amount, { withSi: false, forceUnit: '-' }, decimal)} {row.token}
               </TableCell>
             </TableRow>
           ))}
