@@ -12,7 +12,8 @@ import light from '../components/lighttheme';
 import { SubstrateProvider as HomeProvider } from '../home-context';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const endpoint = process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rococo-rpc.polkadot.io';
+  // const endpoint = process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rococo-rpc.polkadot.io';
+  const endpoint = process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rpc.polkadot.io';
 
   console.log(endpoint, 'endpoint zzz');
 

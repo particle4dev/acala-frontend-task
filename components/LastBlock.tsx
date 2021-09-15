@@ -35,7 +35,6 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
     // used to unsubscribe from the newHead subscription
     const unsubscribeWrap = api.derive.chain.subscribeNewHeads((header: Header) => {
       debug(`Chain is at block: #${header.number}`);
-      console.log(header, 'header zzz', `${header.author}`);
       setLastBlock(`${header.number}`);
     });
     return unsubscribeWrap;
