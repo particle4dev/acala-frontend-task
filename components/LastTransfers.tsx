@@ -136,7 +136,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
 
   const loading = apiState === INIT || apiState === LOADING || lastTransfers.length === 0;
 
-  const decimal = api!.registry!.chainDecimals[0] || 10;
+  const decimal = api ? api.registry!.chainDecimals[0] : 10;
 
   return <Card ref={ref} className={className} style={style} variant="outlined">
     <CardContent>
