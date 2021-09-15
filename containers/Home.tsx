@@ -17,6 +17,7 @@ import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import LastBlock from '../components/LastBlock';
+import LastTransfers from '../components/LastTransfers';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import EventsTable from './EventsTable';
@@ -202,11 +203,10 @@ const Home = () => {
               Overview
             </Typography>
           </Grid>
+ 
           <Grid item sm={3} xs={12}>
             <LastBlock />
           </Grid>
-
-          <SectionSpacingBottom />
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
@@ -278,10 +278,16 @@ const Home = () => {
                 </Grid>
               </div>
               <EventsTable />
+
               <SectionSpacingBottom />
 
             </TableContainer>
           </Grid>
+
+          <Grid item sm={6} xs={12}>
+            <LastTransfers />
+          </Grid>
+
         </Grid>
 
       </Section>

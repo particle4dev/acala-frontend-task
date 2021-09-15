@@ -5,6 +5,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { Header } from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
+import { formatNumber } from '@polkadot/util';
 import {
   useSubstrate,
   READY,
@@ -26,15 +27,15 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
   
   const { state: { apiState, api }} = useSubstrate();
 
-  const [ lastBlock, setLastBlock ] = React.useState<string>('');
+  const [ lastBlock, setLastBlock ] = React.useState<number>(0);
 
   function loadLastBlock(api: ApiPromise) {
     // Subscribe to the new headers on-chain. The callback is fired when new headers
     // are found, the call itself returns a promise with a subscription that can be
     // used to unsubscribe from the newHead subscription
-    const unsubscribeWrap = api.rpc.chain.subscribeNewHeads((header: Header) => {
+    const unsubscribeWrap = api.derive.chain.subscribeNewHeads((header: Header) => {
       debug(`Chain is at block: #${header.number}`);
-      setLastBlock(`${header.number}`);
+      setLastBlock(header.number.toNumber());
     });
     return unsubscribeWrap;
   }
@@ -56,7 +57,7 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
     };
   }, [apiState, api]);
 
-  const loading = apiState === INIT || apiState === LOADING || lastBlock === '';
+  const loading = apiState === INIT || apiState === LOADING || lastBlock === 0;
 
   return <Card ref={ref} className={className} style={style} variant="outlined">
     <CardContent>
@@ -64,7 +65,7 @@ const LastBlock = React.forwardRef(function LastBlock(props: LastBlockProps, ref
         Last block
       </Typography>
       {!loading && <Typography variant="subtitle1">
-        #{lastBlock}
+        #{formatNumber(lastBlock)}
       </Typography>}
       {loading && <PlaceholderLine width={120} />}
     </CardContent>
