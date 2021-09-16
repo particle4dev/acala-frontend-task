@@ -6,6 +6,15 @@ const debug = require('debug')('components:GlobalStyle');
 const useStyles = makeStyles({
   '@global': {
     a: {
+      display: 'inline',
+      margin: 0,
+      padding: 0,
+      fontSize: '1rem',
+      verticalAlign: 'baseline',
+      background: '0 0',
+      cursor: 'pointer',
+      textDecoration: 'none',
+      
       '&:active, &:hover, &:focus, &': {
         textDecoration: 'none'
       }

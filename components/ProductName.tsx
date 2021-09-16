@@ -1,6 +1,7 @@
 import React from 'react';
 import ClassNames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
+import Link from 'next/link';
 
 const debug = require('debug')('containers:ProductName');
 
@@ -11,7 +12,7 @@ const useStyles = makeStyles(() => ({
     height: '24px',
   },
 
-  root__productName: {
+  productName: {
     display: 'inline-block',
     font: '24px/24px Roboto, sans-serif',
     letterSpacing: 0,
@@ -22,7 +23,9 @@ const useStyles = makeStyles(() => ({
   root__gutterLeft: {
     margin: '0 8px'
   }
-}));
+}), {
+  name: 'ProductName'
+});
 
 export type ProductNameProps = {
   gutterLeft: boolean;
@@ -36,22 +39,25 @@ function ProductName(props: ProductNameProps) {
   
   const classes = useStyles({});
 
-  const clsProductName = ClassNames(classes.root__productName, {
+  const clsProductName = ClassNames(classes.productName, {
     [classes.root__gutterLeft]: gutterLeft
   });
 
   return (
     <div className={classes.root} {...other}>
-      <a
-        href="/"
-        data-label="Site Name"
-      >
-        <span className={clsProductName}>{title}</span>
-      </a>
+      <Link href="/">
+        <a
+          data-label="Site Name"
+        >
+          <span className={clsProductName}>{title}</span>
+        </a>
+      </Link>
     </div>
   );
 }
 
-ProductName.displayName = 'containers__ProductName';
+if (process.env.NODE_ENV !== 'production') {
+  ProductName.displayName = 'containers__ProductName';
+}
 
 export default React.memo(ProductName);
