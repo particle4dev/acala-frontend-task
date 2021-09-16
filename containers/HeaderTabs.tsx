@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 export type HeaderTabsProps = {
-  defaultValue: null | string;
+  defaultValue?: null | string;
 }
 
 function HeaderTabs({ defaultValue = null }: HeaderTabsProps) {
@@ -40,9 +40,9 @@ function HeaderTabs({ defaultValue = null }: HeaderTabsProps) {
 
   const router = useRouter();
 
-  const [value, setValue] = React.useState(defaultValue || router.route)
+  const [value, setValue] = React.useState(defaultValue || router.route);
 
-  const handleChange = (evt, value) => {
+  const handleChange = (evt: React.ChangeEvent<{}>, value: string | number) => {
     evt.preventDefault();
     if(!isNumber(value)) {
       setValue(value);

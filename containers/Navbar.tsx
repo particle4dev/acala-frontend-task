@@ -13,14 +13,17 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Fade from '@material-ui/core/Fade';
 import Divider from '@material-ui/core/Divider';
 import { useSubstrate, switchAddress, Address, READY } from "polkadot-react-provider";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 import ToolbarSection from '../components/ToolbarSection';
 import HeaderTabs from './HeaderTabs';
+import ProductName from './ProductName';
 
 // size (optional) is a number, indicating the size (in pixels, 64 as default)
-const size = 40;
+const sizeIdenticon = 40;
 // theme (optional), depicts the type of icon, one of
 // 'polkadot', 'substrate' (default), 'beachball' or 'jdenticon'
-const theme = 'polkadot';
+const themeIdenticon = 'polkadot';
 
 const debug = require('debug')('containers:Navbar');
 
@@ -61,7 +64,11 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
 
   const { state: { keyringState, apiState, api, addresses, address }, dispatch } = useSubstrate();
   
-  const [balance, setBalance] = React.useState<null | string>(null); 
+  const theme = useTheme();
+
+  const onlyBigScreen = useMediaQuery(theme.breakpoints.up('sm'));
+  
+  const [ balance, setBalance ] = React.useState<null | string>(null); 
 
   // const accountPair = keyringState === READY && keyring.getPair(initialAddress);
   
@@ -73,7 +80,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   }
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  
+
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -110,16 +117,9 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h6" component="p" style={{
-            margin: '0px 8px',
-          }}>
-            {title}
-          </Typography>
+          <ProductName gutterLeft />
 
-          {/* <div className={classes.root__onlyBigScreen}>
-            <HeaderTabs />
-          </div> */}
-          <HeaderTabs />
+          {onlyBigScreen && <HeaderTabs />}
 
         </ToolbarSection>
         <ToolbarSection end>
@@ -152,8 +152,8 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
                 aria-controls="fade-menu"
                 aria-haspopup="true"
                 value={address}
-                size={size}
-                theme={theme}
+                size={sizeIdenticon}
+                theme={themeIdenticon}
               />
             </IconButton>
             <Menu
