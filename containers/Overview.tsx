@@ -7,6 +7,7 @@ import Content from '../components/Content';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import LastBlock from '../components/LastBlock';
 import LastTransfers from '../components/LastTransfers';
+import Footer from '../components/Footer';
 
 const Home = () => {
   return (
@@ -35,6 +36,7 @@ const Home = () => {
 
       </Section>
     </Content>
+    <Footer />
     </>
   );
 }

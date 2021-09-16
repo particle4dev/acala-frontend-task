@@ -16,8 +16,7 @@ import Section from '../components/Section';
 import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
-import LastBlock from '../components/LastBlock';
-import LastTransfers from '../components/LastTransfers';
+import Footer from '../components/Footer';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import EventsTable from './EventsTable';
@@ -286,6 +285,7 @@ const Home = () => {
 
       </Section>
     </Content>
+    <Footer />
     </>
   )
 }
