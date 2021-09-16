@@ -8,6 +8,7 @@ import RobotoHead from '../components/RobotoHead';
 import ThemeProvider from '../components/ThemeProvider';
 import GlobalStyle from '../components/GlobalStyle';
 import Global from '../components/Global';
+import Footer from '../components/Footer';
 import light from '../components/lighttheme';
 import Notifications from '../containers/Notifications';
 import { SubstrateProvider as HomeProvider } from '../home-context';
@@ -34,6 +35,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <HomeProvider>
           <ThemeProvider theme={light}>
             <Component {...pageProps} />
+            <Footer />
             <GlobalStyle />
             <Global />
             <Notifications />

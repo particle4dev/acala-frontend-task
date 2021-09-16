@@ -69,9 +69,9 @@ function HeaderTabs({ defaultValue = null }: HeaderTabsProps) {
         value={'/'}
       />
       <Tab
-        label='Scanner'
+        label='Overview'
         className={classes.root__tab}
-        value={'/scanner'}
+        value={'/overview'}
       />
     </Tabs>
   );

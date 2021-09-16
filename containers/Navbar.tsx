@@ -16,8 +16,8 @@ import { useSubstrate, switchAddress, Address, READY } from "polkadot-react-prov
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { useTheme } from '@material-ui/core/styles';
 import ToolbarSection from '../components/ToolbarSection';
+import ProductName from '../components/ProductName';
 import HeaderTabs from './HeaderTabs';
-import ProductName from './ProductName';
 
 // size (optional) is a number, indicating the size (in pixels, 64 as default)
 const sizeIdenticon = 40;
@@ -54,12 +54,11 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export type NavbarProps = WithStyles<typeof styles> & {
-  title?: React.ReactNode;
   children?: React.ReactNode;
   style?: React.CSSProperties;
 };
 
-function Navbar({ children, classes, title, style }: NavbarProps) {
+function Navbar({ children, classes, style }: NavbarProps) {
   debug('render');
 
   const { state: { keyringState, apiState, api, addresses, address }, dispatch } = useSubstrate();
@@ -184,8 +183,6 @@ if (process.env.NODE_ENV !== 'production') {
   Navbar.displayName = 'containers__Navbar';
 }
 
-Navbar.defaultProps = {
-  title: 'Polkadot Scanner'
-};
+Navbar.defaultProps = {};
 
 export default React.memo(withStyles(styles, {name: 'containers__Navbar'})(Navbar));
