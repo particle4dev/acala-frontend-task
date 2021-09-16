@@ -9,13 +9,12 @@ import ThemeProvider from '../components/ThemeProvider';
 import GlobalStyle from '../components/GlobalStyle';
 import Global from '../components/Global';
 import light from '../components/lighttheme';
+import Notifications from '../containers/Notifications';
 import { SubstrateProvider as HomeProvider } from '../home-context';
 
 function MyApp({ Component, pageProps }: AppProps) {
   // const endpoint = process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rococo-rpc.polkadot.io';
   const endpoint = process.env!.NEXT_PUBLIC_ENDPOINT || 'wss://rpc.polkadot.io';
-
-  console.log(endpoint, 'endpoint zzz');
 
   React.useEffect(() => {
     // Remove the server-side injected CSS.
@@ -37,6 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
             <GlobalStyle />
             <Global />
+            <Notifications />
           </ThemeProvider>
         </HomeProvider>
       </SubstrateProvider>

@@ -11,8 +11,10 @@ import Identicon from '@polkadot/react-identicon';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Fade from '@material-ui/core/Fade';
+import Divider from '@material-ui/core/Divider';
 import { useSubstrate, switchAddress, Address, READY } from "polkadot-react-provider";
 import ToolbarSection from '../components/ToolbarSection';
+import HeaderTabs from './HeaderTabs';
 
 // size (optional) is a number, indicating the size (in pixels, 64 as default)
 const size = 40;
@@ -23,12 +25,6 @@ const theme = 'polkadot';
 const debug = require('debug')('containers:Navbar');
 
 const styles = (theme: Theme) => createStyles({
-  root: {
-    boxShadow: 'none',
-    backgroundColor: theme.palette.background.default,
-    // left: 72
-  },
-
   root__onlySmallScreen: {
     [theme.breakpoints.up('md')]: {
       display: 'none',
@@ -40,6 +36,18 @@ const styles = (theme: Theme) => createStyles({
       display: 'none',
     },
   },
+
+  root__divider: {
+    bottom: -5,
+    boxShadow: 'inset 0px 4px 8px -3px rgba(17, 17, 17, .06)',
+    height: 5,
+    opacity: 1,
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: 0,
+    left: 0,
+    backgroundColor: 'transparent',
+},
 });
 
 export type NavbarProps = WithStyles<typeof styles> & {
@@ -65,6 +73,7 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   }
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  
   const open = Boolean(anchorEl);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -89,21 +98,29 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
   return (
     <AppBar
       position="fixed"
-      color="default"
-      className={classes.root} style={style} elevation={0}
+      color="inherit"
+      style={style}
+      elevation={0}
     >
       <Toolbar>
         <ToolbarSection
           // start
           style={{
-            flex: ' 1 1 auto'
+            flex: ' 1 1 auto',
+            alignItems: 'center',
           }}
         >
           <Typography variant="h6" component="p" style={{
-            margin: '8px 8px 0px',
+            margin: '0px 8px',
           }}>
             {title}
           </Typography>
+
+          {/* <div className={classes.root__onlyBigScreen}>
+            <HeaderTabs />
+          </div> */}
+          <HeaderTabs />
+
         </ToolbarSection>
         <ToolbarSection end>
           {isLoggedIn? <>
@@ -157,6 +174,8 @@ function Navbar({ children, classes, title, style }: NavbarProps) {
         </ToolbarSection>
       </Toolbar>
       {children}
+
+      <Divider className={classes.root__divider} />
     </AppBar>
   );
 }

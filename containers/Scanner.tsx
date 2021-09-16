@@ -196,22 +196,90 @@ const Home = () => {
 
       <Content top={64}>
         <Section>
+            
         <SectionSpacingBottom />
         <Grid container spacing={2}>
+          
           <Grid item xs={12}>
             <Typography variant="h4" gutterBottom>
-              Overview
+              Scanner
             </Typography>
           </Grid>
- 
-          <Grid item sm={3} xs={12}>
-            <LastBlock />
-          </Grid>
-          
-          <Grid item xs={12}></Grid>
 
-          <Grid item sm={6} xs={12}>
-            <LastTransfers />
+          <Grid item xs={12}>
+            <TableContainer component={Paper} variant="outlined" elevation={0}>
+              <div className={classes.control}>
+                <Grid container spacing={2}>
+                  <Grid item sm={3} xs={12}>
+                    <ValidationStartBlockInput
+                      fullWidth
+                      disabled={loading}
+                      label="Start Block"
+                      variant="outlined"
+                      value={`${filter.startBlock}`}
+                      onChange={handleStartBlockChange}
+                      onError={onErrorStartBlockChange}
+                    />
+                  </Grid>
+                  <Grid item sm={3} xs={12}>
+                    <ValidationEndBlockInput
+                      fullWidth
+                      disabled={loading}
+                      label="End Block"
+                      variant="outlined"
+                      value={`${filter.endBlock || ''}`}
+                      onChange={handleEndBlockChange}
+                      onError={onErrorEndBlockChange}
+                    />
+                  </Grid>
+                  <Grid item sm={5} xs={12}>
+                    <ValidationEndpointInput 
+                      fullWidth
+                      disabled={loading}
+                      label="Endpoint"
+                      variant="outlined"
+                      value={endpointStatus}
+                      onChange={handleEndpointChange}
+                      onError={onErrorEndpointChange}
+                    />
+                  </Grid>
+                  <Grid item sm={1} xs={12}>
+                    <Button 
+                      disableElevation
+                      className={classes.scanButton}
+                      disabled={loading || !sendButtonState.startBlock || !sendButtonState.endBlock || !sendButtonState.endpoint}
+                      variant="contained"
+                      color="primary"
+                      onClick={onScan}
+                    >
+                      Scan
+                    </Button>
+                  </Grid>
+                  <Grid item sm={6} xs={12}>
+                    <TextField
+                      fullWidth
+                      value={filter.searchInput}
+                      onChange={handleSearchInputChange}
+                      disabled={loading}
+                      variant="outlined" 
+                      id="input-with-icon-search"
+                      label="Filter by name"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </div>
+              <EventsTable />
+
+              <SectionSpacingBottom />
+
+            </TableContainer>
           </Grid>
 
         </Grid>
