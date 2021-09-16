@@ -106,7 +106,6 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
       });
 
       if(newTxs.length > 0) {
-        console.log(newTxs, 'newTxs');
         setLastTransfers((pre: Transaction[]) => ([
           ...newTxs,
           ...pre.slice(0, 10 - newTxs.length)
