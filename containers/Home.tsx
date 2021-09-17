@@ -1,8 +1,6 @@
 import * as React from 'react';
-// import isNumber from 'lodash/isNumber';
 import {makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { ApiPromise } from '@polkadot/api';
-// import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
