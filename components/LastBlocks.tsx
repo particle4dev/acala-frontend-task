@@ -21,7 +21,7 @@ import {
 import PlaceholderLine from './PlaceholderLine';
 import EmptyRow from './EmptyRow';
 
-const MAX_BLOCKS = 10;
+const MAX_BLOCKS = 9;
 
 const debug = require('debug')('components:LastBlocks');
 
