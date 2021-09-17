@@ -11,7 +11,12 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Navbar from './Navbar';
+import {
+  useSubstrate,
+  LOADING,
+  READY,
+  switchEndpoint
+} from "polkadot-react-provider";
 import Section from '../components/Section';
 import Content from '../components/Content';
 import ProgressBar from '../components/ProgressBar';
@@ -19,13 +24,8 @@ import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import Footer from '../components/Footer';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
-import EventsTable from './EventsTable';
-import {
-  useSubstrate,
-  LOADING,
-  READY,
-  switchEndpoint
-} from "polkadot-react-provider";
+import LastBlock from '../components/LastBlock';
+import LastFinalized from '../components/LastFinalized';
 import {
   useSubstrate as useHomeContext,
   updateStartBlock,
@@ -33,6 +33,8 @@ import {
   updateSearchInput,
   updateSearchState,
 } from '../home-context';
+import Navbar from './Navbar';
+import EventsTable from './EventsTable';
 
 const TextInput = ({ error, isError, ...props }: any) => (
   <TextField
@@ -195,7 +197,7 @@ const Home = () => {
 
       <Content top={64}>
         <Section>
-            
+
         <SectionSpacingBottom />
         <Grid container spacing={2}>
           
@@ -204,6 +206,16 @@ const Home = () => {
               Scanner
             </Typography>
           </Grid>
+
+          <Grid item sm={3} xs={12}>
+            <LastBlock />
+          </Grid>
+          
+          <Grid item sm={3} xs={12}>
+            <LastFinalized />
+          </Grid>
+          
+          <Grid item xs={12}></Grid>
 
           <Grid item xs={12}>
             <TableContainer component={Paper} variant="outlined" elevation={0}>
