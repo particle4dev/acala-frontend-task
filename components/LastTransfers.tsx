@@ -142,6 +142,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
       <Typography variant="h5" gutterBottom>
         Last Transfers
       </Typography>
+      
       {loading && <PlaceholderLine width={120} />}
 
       <Table aria-label="simple table">
@@ -166,7 +167,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
                 <Typography variant="subtitle1">
                   From: {toShortAddress(row.from, 16)}
                 </Typography>
-                <Typography variant="subtitle1">
+                <Typography variant="caption">
                   To: {toShortAddress(row.to, 16)}
                 </Typography>
               </TableCell>
