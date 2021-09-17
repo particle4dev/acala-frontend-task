@@ -8,9 +8,10 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import Avatar from '@material-ui/core/Avatar';
 import TableRow from '@material-ui/core/TableRow';
-import type { AccountId, AccountIndex, Address, Header, HeaderExtended } from '@polkadot/types/interfaces';
+import type { HeaderExtended } from '@polkadot/api-derive/types';
+import type { AccountId, AccountIndex, Address, Header } from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
-import { formatBalance, formatNumber } from '@polkadot/util';
+import { formatNumber } from '@polkadot/util';
 import {
   useSubstrate,
   READY,
@@ -47,20 +48,21 @@ const LastBlocks = React.forwardRef(function LastBlocks(props: LastBlocksProps, 
   const [ lastBlocks, setLastBlocks ] = React.useState<HeaderExtended[]>([]);
 
   function loadLastBlocks(api: ApiPromise) {
-    const unsubscribeWrap = api.derive.chain.subscribeNewHeads(async (header: Header) => {
-      debug(`Chain is at block: #${header.number}`);
-      console.log(header, 'header');
-      const blockNumber = header.number.unwrap();
+    const unsubscribeWrap = api.derive.chain.subscribeNewHeads((header): void => {
+      if (header?.number) {
+        debug(`Chain is at block: #${header.number}`);
+        const blockNumber = header.number.unwrap();
 
-      setLastBlocks((blocks: HeaderExtended[]) => (
-        blocks
-        .filter((old: HeaderExtended, index: number) => index < MAX_BLOCKS && old.number.unwrap().lt(blockNumber))
-        .reduce((next: HeaderExtended[], header: HeaderExtended): HeaderExtended[] => {
-          next.push(header);
-          return next;
-        }, [header])
-        .sort((a: HeaderExtended, b: HeaderExtended) => b.number.unwrap().cmp(a.number.unwrap()))
-      ));
+        setLastBlocks((blocks: HeaderExtended[]) => (
+          blocks
+            .filter((old: HeaderExtended, index: number) => index < MAX_BLOCKS && old.number.unwrap().lt(blockNumber))
+            .reduce((next: HeaderExtended[], header: HeaderExtended): HeaderExtended[] => {
+              next.push(header);
+              return next;
+            }, [header])
+            .sort((a: HeaderExtended, b: HeaderExtended) => b.number.unwrap().cmp(a.number.unwrap()))
+        ));
+      }
     });
     return unsubscribeWrap;
   }
@@ -114,7 +116,7 @@ const LastBlocks = React.forwardRef(function LastBlocks(props: LastBlocksProps, 
               </TableCell>
               <TableCell>
                 <Typography variant="subtitle1">
-                  Miner {toShortAddress(row.author.toHex())}
+                  Miner {row && row.author && toShortAddress(row.author.toHex())}
                 </Typography>
                 <Typography variant="subtitle1">
                   {/* To: {toShortAddress(row.to, 16)} */}
