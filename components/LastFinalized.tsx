@@ -31,11 +31,6 @@ const LastFinalized = React.forwardRef(function LastFinalized(props: LastFinaliz
   const [ lastFinalized, setLastFinalized ] = React.useState<number>(0);
 
   function loadLastFinalized(api: ApiPromise) {
-    // Subscribe to the new headers on-chain. The callback is fired when new headers
-    // are found, the call itself returns a promise with a subscription that can be
-    // used to unsubscribe from the newHead subscription
-    // console.log(api.derive.chain.bestNumberFinalized, 'chain.bestNumberFinalized');
-    
     const unsubscribeWrap = api.derive.chain.bestNumberFinalized((bestNumberFinalized: BlockNumber) => {
       debug(`Chain is at best block number: #${bestNumberFinalized}`);
       setLastFinalized(bestNumberFinalized.toNumber());
