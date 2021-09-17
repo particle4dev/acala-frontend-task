@@ -176,9 +176,8 @@ const Home = () => {
   }
 
   const updateEndBlockInput = async (api: ApiPromise) => {
-    const signedBlock = await api.rpc.chain.getBlock();
-    const blockNumber = signedBlock.block.header.number.toNumber();
-    dispatch(updateEndBlock(blockNumber));
+    const blockNumber = await api.derive.chain.bestNumberFinalized();
+    dispatch(updateEndBlock(blockNumber.toNumber()));
   }
   
   React.useEffect(() => {
@@ -210,7 +209,7 @@ const Home = () => {
           <Grid item sm={3} xs={12}>
             <LastBlock />
           </Grid>
-          
+
           <Grid item sm={3} xs={12}>
             <LastFinalized />
           </Grid>
