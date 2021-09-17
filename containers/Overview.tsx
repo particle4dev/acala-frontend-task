@@ -6,6 +6,7 @@ import Section from '../components/Section';
 import Content from '../components/Content';
 import SectionSpacingBottom from '../components/SectionSpacingBottom';
 import LastBlock from '../components/LastBlock';
+import LastFinalized from '../components/LastFinalized';
 import LastTransfers from '../components/LastTransfers';
 import Footer from '../components/Footer';
 
@@ -27,6 +28,10 @@ const Home = () => {
             <LastBlock />
           </Grid>
           
+          <Grid item sm={3} xs={12}>
+            <LastFinalized />
+          </Grid>
+
           <Grid item xs={12}></Grid>
 
           <Grid item sm={6} xs={12}>
