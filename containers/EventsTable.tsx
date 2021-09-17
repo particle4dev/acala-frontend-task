@@ -22,7 +22,8 @@ import EventsTableRowLoading from './EventsTableRowLoading';
 
 type Block = {
   name: string;
-  blocknumber: string;
+  blocknumber: number;
+  index: number;
   phase: string;
   data: string;
 };
@@ -181,12 +182,13 @@ const EventsTable = () => {
       allRecords.forEach((data: EventRecord, index: number) => {
         const { phase, event } = data;
         const b: Block = {
-          blocknumber: `${block}-${index}`,
+          blocknumber: block,
+          index,
           name: `${event.section}.${event.method}`,
           phase: JSON.stringify(phase.toJSON()),
           data: JSON.stringify(event.data.toJSON()),
         };
-        list.unshift(b);
+        list.push(b);
       });
 
       resolve(list);
@@ -265,7 +267,7 @@ const EventsTable = () => {
         {stableSort(events, getComparator(order, orderBy)).map((row: Block, index: number) => (
           <TableRow key={`${row.name}-${index}`}>
             <TableCell component="th" scope="row">
-              #{row.blocknumber}
+              #{row.blocknumber} - {row.index}
             </TableCell>
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.phase}</TableCell>
