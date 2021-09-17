@@ -25,6 +25,7 @@ import Footer from '../components/Footer';
 import validate from '../components/Form/validate';
 import { requiredNumber, greaterThanZero } from '../components/Form/helper';
 import LastBlock from '../components/LastBlock';
+import LastFinalized from '../components/LastFinalized';
 import {
   useSubstrate as useHomeContext,
   updateStartBlock,
@@ -208,6 +209,10 @@ const Home = () => {
 
           <Grid item sm={3} xs={12}>
             <LastBlock />
+          </Grid>
+          
+          <Grid item sm={3} xs={12}>
+            <LastFinalized />
           </Grid>
           
           <Grid item xs={12}></Grid>
