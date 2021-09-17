@@ -11,9 +11,9 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import TablePagination from '@material-ui/core/TablePagination';
-import Typography from '@material-ui/core/Typography';
 import { EventRecord } from '@polkadot/types/interfaces';
 import { useSubstrate, LOADING, READY } from "polkadot-react-provider";
+import EmptyRow from '../components/EmptyRow';
 import { 
   useSubstrate as useHomeContext, 
   updateSearchState
@@ -119,12 +119,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
-  },
-
-  emptyRow: {
-    padding: '10px 24px 10px 16px',
-    borderBottom: '1px solid rgba(224, 224, 224, 1)',
-    textAlign: 'center',
   },
 
   visuallyHidden: {
@@ -277,11 +271,7 @@ const EventsTable = () => {
       </TableBody>
     </Table>
 
-    {!loading && events.length === 0 && <div className={classes.emptyRow}>
-      <Typography>
-        Sorry, no matching records found
-      </Typography>
-    </div>}
+    {!loading && events.length === 0 && <EmptyRow />}
 
     <TablePagination
       rowsPerPageOptions={[rowsPerPage]}

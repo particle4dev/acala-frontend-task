@@ -18,6 +18,7 @@ import {
   INIT,
 } from "polkadot-react-provider";
 import PlaceholderLine from './PlaceholderLine';
+import EmptyRow from './EmptyRow';
 
 const debug = require('debug')('components:LastTransfers');
 
@@ -133,7 +134,7 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
     };
   }, [apiState, api]);
 
-  const loading = apiState === INIT || apiState === LOADING || lastTransfers.length === 0;
+  const loading = apiState === INIT || apiState === LOADING;
 
   const decimal = api ? api.registry!.chainDecimals[0] : 10;
 
@@ -178,6 +179,8 @@ const LastTransfers = React.forwardRef(function LastTransfers(props: LastTransfe
           ))}
         </TableBody>
       </Table>
+      
+      {!loading && lastTransfers.length === 0 && <EmptyRow />}
 
     </CardContent>
   </Card>;

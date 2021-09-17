@@ -19,6 +19,7 @@ import {
   INIT,
 } from "polkadot-react-provider";
 import PlaceholderLine from './PlaceholderLine';
+import EmptyRow from './EmptyRow';
 
 const MAX_BLOCKS = 10;
 
@@ -84,7 +85,7 @@ const LastBlocks = React.forwardRef(function LastBlocks(props: LastBlocksProps, 
     };
   }, [apiState, api]);
 
-  const loading = apiState === INIT || apiState === LOADING || lastBlocks.length === 0;
+  const loading = apiState === INIT || apiState === LOADING;
 
   // const decimal = api ? api.registry!.chainDecimals[0] : 10;
 
@@ -129,6 +130,8 @@ const LastBlocks = React.forwardRef(function LastBlocks(props: LastBlocksProps, 
           ))}
         </TableBody>
       </Table>
+      
+      {!loading && lastBlocks.length === 0 && <EmptyRow />}
 
     </CardContent>
   </Card>;
